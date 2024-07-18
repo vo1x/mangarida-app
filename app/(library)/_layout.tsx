@@ -11,9 +11,12 @@ export default function LibraryLayout() {
         name="[manga]"
         options={{
           headerTitle: "",
-          headerStyle: { backgroundColor: "#000", borderColor: "#000" },
+          headerStyle: { backgroundColor: "#000", borderColor: "#000",  },
           headerShadowVisible: false,
+          headerTintColor:'#FE375E'
+          
         }}
+        
       />
     </Stack>
   );
