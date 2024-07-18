@@ -10,8 +10,13 @@ export default function SearchLayout() {
       />
       <Tabs.Screen
         name="[manga]"
-        options={{ href: null, headerTitle: "" }}
-      />
+        options={{
+          headerTitle: "abc",
+          headerStyle: { backgroundColor: "#000", borderColor: "#000" }, // Example of setting header style
+        }}
+      >
+        {/* Your screen content goes here */}
+      </Tabs.Screen>
     </Stack>
   );
 }

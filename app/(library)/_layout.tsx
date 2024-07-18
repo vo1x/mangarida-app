@@ -6,12 +6,17 @@ export default function LibraryLayout() {
     <Stack>
       <Tabs.Screen
         name="index"
-        options={{ href: null, title: "Search", headerShown: false }}
+        options={{ href: null, title: "Library", headerShown: false }}
       />
       <Tabs.Screen
         name="[manga]"
-        options={{ href: null, headerTitle: "" }}
-      />
+        options={{
+          headerTitle: "abc",
+          headerStyle: { backgroundColor: "#000", borderColor: "#000" }, // Example of setting header style
+        }}
+      >
+        {/* Your screen content goes here */}
+      </Tabs.Screen>
     </Stack>
   );
 }

@@ -53,10 +53,10 @@ export default function Search() {
         />
       </View>
 
-      <Link href={"/manga/abcd"} className="text-white">
+      <Link href={"search/[abcd]"} className="text-white">
         click me daddyt
       </Link>
-      <Pressable onPress={() => router.push("search/manga/1")}>
+      <Pressable onPress={() => router.push("search/[manga]")}>
         <Text className="text-3xl font-bold text-white">Go to manga info</Text>
       </Pressable>
       <View className={`mt-8 flex flex-row flex-wrap justify-between mr-4`}>
@@ -64,7 +64,7 @@ export default function Search() {
           ? searchResults.map((item: any, index) => (
               <Pressable
                 key={index}
-                onPress={() => router.push(`/search/manga/${item.slug}`)}
+                onPress={() => router.push(`search/${item.slug}`)}
               >
                 <MangaCard
                   key={index}

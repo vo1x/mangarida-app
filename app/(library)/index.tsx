@@ -4,6 +4,8 @@ import { ScrollView } from "react-native";
 import MangaCard from "@/components/MangaCard";
 import ThemedScrollView from "@/components/ThemedScrollView";
 import { useEffect, useState } from "react";
+import { Pressable } from "react-native";
+import { router } from "expo-router";
 interface LatestChapter {
   chNum: number;
   volume: number;
@@ -49,11 +51,16 @@ export default function Library() {
       <View className={`mt-4 flex flex-row flex-wrap justify-between mr-4`}>
         {trending.length > 0
           ? trending.map((item: any, index) => (
-              <MangaCard
+              <Pressable
                 key={index}
-                title={item.name}
-                imgUrl={item.posterUrl}
-              />
+                onPress={() => router.push(`${item.slug}`)}
+              >
+                <MangaCard
+                  key={index}
+                  title={item.name}
+                  imgUrl={item.posterUrl}
+                />
+              </Pressable>
             ))
           : null}
         {/* <Text className="text-white">{JSON.stringify(trending, null, 2)}</Text> */}

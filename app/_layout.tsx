@@ -20,6 +20,7 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
+  const colorScheme = useColorScheme();
 
   useEffect(() => {
     if (loaded) {
@@ -30,7 +31,6 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
-  const colorScheme = useColorScheme();
 
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
@@ -41,7 +41,7 @@ export default function RootLayout() {
         }}
       >
         <Tabs.Screen
-          name="library"
+          name="(library)"
           options={{
             title: "Library",
             tabBarIcon: ({ color, focused }) => (
@@ -50,7 +50,7 @@ export default function RootLayout() {
           }}
         />
         <Tabs.Screen
-          name="search"
+          name="(search)"
           options={{
             title: "Search",
             tabBarIcon: ({ color, focused }) => (
