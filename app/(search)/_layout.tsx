@@ -1,5 +1,4 @@
 import { Stack, Tabs } from "expo-router";
-import React from "react";
 
 export default function SearchLayout() {
   return (
@@ -11,12 +10,11 @@ export default function SearchLayout() {
       <Tabs.Screen
         name="[manga]"
         options={{
-          headerTitle: "abc",
-          headerStyle: { backgroundColor: "#000", borderColor: "#000" }, // Example of setting header style
+          headerTitle: "",
+          headerStyle: { backgroundColor: "#000", borderBottomWidth: 0 },
+          headerShadowVisible: false,
         }}
-      >
-        {/* Your screen content goes here */}
-      </Tabs.Screen>
+      ></Tabs.Screen>
     </Stack>
   );
 }

@@ -1,11 +1,11 @@
 import { View, Text, TextInput, Button } from "react-native";
 import axios from "axios";
-import { ScrollView } from "react-native";
 import MangaCard from "@/components/MangaCard";
 import ThemedScrollView from "@/components/ThemedScrollView";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Pressable } from "react-native";
 import { router } from "expo-router";
+
 interface LatestChapter {
   chNum: number;
   volume: number;
@@ -25,17 +25,11 @@ export default function Library() {
   const getTrending = async () => {
     try {
       const { data } = await axios.get("http://192.168.1.73:5000/trending");
-      console.log(data);
-      setTrending(data.results); // Update state with fetched data
+      setTrending(data.results);
     } catch (error) {
       console.error("Error fetching trending data:", error);
-      // Handle error state or display an error message
     }
   };
-
-  // useEffect(() => {
-  //   getTrending();
-  // }, []);
 
   return (
     <ThemedScrollView className={`flex flex-col mt-32 ml-4`}>
@@ -53,7 +47,7 @@ export default function Library() {
           ? trending.map((item: any, index) => (
               <Pressable
                 key={index}
-                onPress={() => router.push(`${item.slug}`)}
+                onPress={() => router.push(`(library)/${item.slug}`)}
               >
                 <MangaCard
                   key={index}
@@ -63,7 +57,6 @@ export default function Library() {
               </Pressable>
             ))
           : null}
-        {/* <Text className="text-white">{JSON.stringify(trending, null, 2)}</Text> */}
         <Button title="Touch me" onPress={() => getTrending()}></Button>
       </View>
     </ThemedScrollView>
