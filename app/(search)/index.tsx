@@ -46,7 +46,14 @@ export default function Search() {
           ? searchResults.map((item: any, index) => (
               <Pressable
                 key={index}
-                onPress={() => router.push(`(search)/${item.slug}`)}
+                onPress={() =>
+                  router.push({
+                    pathname: `(search)/${item.slug}`,
+                    params: {
+                      isBookmarked: item.isBookmarked,
+                    },
+                  })
+                }
               >
                 <MangaCard
                   key={index}

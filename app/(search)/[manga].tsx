@@ -8,6 +8,7 @@ import { Button, Pressable } from "react-native";
 import { Bookmark, DownloadIcon } from "lucide-react-native";
 import { ScrollView } from "react-native";
 import { FlatList } from "react-native";
+
 interface MangaDetails {
   name: string;
   altNames: string[];
@@ -20,8 +21,8 @@ interface MangaDetails {
   genres: string[];
   mangazines: string[];
   chapters: ChapterResult[];
-  slug: string | undefined;
-  isBookmarked: boolean;
+  slug: string;
+  isBookmarked: string;
 }
 
 interface ChapterResult {
@@ -30,10 +31,18 @@ interface ChapterResult {
   publishedOn: string;
   chNum: number;
 }
+
+interface MangaParams extends Record<string, string> {
+  isBookmarked: string;
+  manga: string;
+}
+
 import useAsyncStorage from "@/hooks/useAsyncStorage";
 
 export default function MangaDetailsPage() {
-  const { manga } = useLocalSearchParams<{ manga: string }>();
+  const params = useLocalSearchParams<MangaParams>();
+  const isBookmarked = params.isBookmarked === "true";
+  const manga = params.manga;
   const [metaData, setMetadata] = useState<MangaDetails>();
   const [chapters, setChapters] = useState<ChapterResult[]>([]);
   const { bookmarkManga } = useAsyncStorage();
@@ -56,7 +65,7 @@ export default function MangaDetailsPage() {
       setMetadata((prev: MangaDetails | undefined) => ({
         ...prev!,
         chapters: data.chapters,
-        slug: manga,
+        slug: manga!,
       }));
 
       setChapters(data.chapters);
@@ -67,7 +76,7 @@ export default function MangaDetailsPage() {
 
   const { checkIfMangaInLibrary } = useAsyncStorage();
 
-  const [bookmarked, setBookmarked] = useState<boolean>(false);
+  const [bookmarked, setBookmarked] = useState<boolean>(isBookmarked);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -110,18 +119,20 @@ export default function MangaDetailsPage() {
               <Text className="text-gray-400">
                 {metaData.author.join(", ")}
               </Text>
-              <View className="flex flex-row items-center gap-2 mt-1">
-                <Pressable onPress={() => handleBookmark(metaData)}>
-                  <Bookmark
-                    color={"#FE375E"}
-                    fill={bookmarked ? "#FE375E" : "none"}
-                    size={30}
-                  />
-                </Pressable>
-                <Pressable>
-                  <DownloadIcon color={"#FE375E"} size={30} />
-                </Pressable>
-              </View>
+              {metaData && metaData.chapters?.length > 0 && (
+                <View className="flex flex-row items-center gap-2 mt-1">
+                  <Pressable onPress={() => handleBookmark(metaData)}>
+                    <Bookmark
+                      color={"#FE375E"}
+                      fill={bookmarked ? "#FE375E" : "none"}
+                      size={30}
+                    />
+                  </Pressable>
+                  <Pressable>
+                    <DownloadIcon color={"#FE375E"} size={30} />
+                  </Pressable>
+                </View>
+              )}
             </View>
           </View>
           <View className="mt-4">

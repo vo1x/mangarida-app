@@ -13,8 +13,8 @@ interface MangaDetails {
   genres: string[];
   mangazines: string[];
   chapters: ChapterResult[];
-  slug: string | undefined;
-  isBookmarked: boolean;
+  slug: string;
+  isBookmarked: string;
 }
 
 interface ChapterResult {
@@ -57,7 +57,7 @@ export default function useAsyncStorage() {
         console.log("Manga unbookmarked successfully!");
         return false;
       }
-      existingLibrary.push({ ...mangaDetails, isBookmarked: true });
+      existingLibrary.push({ ...mangaDetails, isBookmarked: "true" });
 
       await AsyncStorage.setItem(key, JSON.stringify(existingLibrary));
       emitAsyncStorageUpdated();

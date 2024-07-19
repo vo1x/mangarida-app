@@ -8,6 +8,7 @@ import { Button, Pressable } from "react-native";
 import { Bookmark, DownloadIcon } from "lucide-react-native";
 import { ScrollView } from "react-native";
 import { FlatList } from "react-native";
+
 interface MangaDetails {
   name: string;
   altNames: string[];
@@ -20,8 +21,8 @@ interface MangaDetails {
   genres: string[];
   mangazines: string[];
   chapters: ChapterResult[];
-  slug: string | undefined;
-  isBookmarked: boolean;
+  slug: string;
+  isBookmarked: string;
 }
 
 interface ChapterResult {
@@ -30,10 +31,24 @@ interface ChapterResult {
   publishedOn: string;
   chNum: number;
 }
+
+interface MangaParams extends Record<string, string> {
+  isBookmarked: string;
+  manga: string;
+  name: string;
+  posterUrl: string;
+  synopsis: string;
+}
+
 import useAsyncStorage from "@/hooks/useAsyncStorage";
 
 export default function MangaDetailsPage() {
-  const { manga } = useLocalSearchParams<{ manga: string }>();
+  const params = useLocalSearchParams<MangaParams>();
+  const isBookmarked = params.isBookmarked === "true";
+  const manga = params.manga;
+  const name = params.name;
+  const posterUrl = params.posterUrl;
+  const synopsis = params.synopsis;
   const [metaData, setMetadata] = useState<MangaDetails>();
   const [chapters, setChapters] = useState<ChapterResult[]>([]);
   const { bookmarkManga } = useAsyncStorage();
@@ -56,7 +71,7 @@ export default function MangaDetailsPage() {
       setMetadata((prev: MangaDetails | undefined) => ({
         ...prev!,
         chapters: data.chapters,
-        slug: manga,
+        slug: manga!,
       }));
 
       setChapters(data.chapters);
@@ -67,7 +82,7 @@ export default function MangaDetailsPage() {
 
   const { checkIfMangaInLibrary } = useAsyncStorage();
 
-  const [bookmarked, setBookmarked] = useState<boolean>();
+  const [bookmarked, setBookmarked] = useState<boolean>(isBookmarked);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -95,21 +110,16 @@ export default function MangaDetailsPage() {
 
   return (
     <View className="mx-4 mt-4">
-      {metaData && (
-        <View className="flex flex-col ">
-          <View className=" flex flex-row items-end  ">
-            <Image
-              source={{ uri: metaData.posterUrl }}
-              className="w-32 h-48 rounded-lg"
-            />
-            <View className="ml-2">
-              <Text className="text-white text-2xl font-semibold ">
-                {metaData.name}
-              </Text>
+      <View className="flex flex-col ">
+        <View className=" flex flex-row items-end  ">
+          <Image source={{ uri: posterUrl }} className="w-32 h-48 rounded-lg" />
+          <View className="ml-2">
+            <Text className="text-white text-2xl font-semibold ">{name}</Text>
 
-              <Text className="text-gray-400">
-                {metaData.author.join(", ")}
-              </Text>
+            <Text className="text-gray-400">
+              {metaData && metaData.author.join(", ")}
+            </Text>
+            {metaData && metaData.chapters?.length > 0 && (
               <View className="flex flex-row items-center gap-2 mt-1">
                 <Pressable onPress={() => handleBookmark(metaData)}>
                   <Bookmark
@@ -122,18 +132,20 @@ export default function MangaDetailsPage() {
                   <DownloadIcon color={"#FE375E"} size={30} />
                 </Pressable>
               </View>
-            </View>
+            )}
           </View>
-          <View className="mt-4">
-            <Text className="text-white text-base mb-4" numberOfLines={3}>
-              {metaData.synopsis}
-            </Text>
-            <ScrollView
-              horizontal
-              showsHorizontalScrollIndicator={false}
-              className="flex flex-row gap-x-2 overflow-scroll"
-            >
-              {metaData.genres.map((genre, i) => (
+        </View>
+        <View className="mt-4">
+          <Text className="text-white text-base mb-4" numberOfLines={3}>
+            {synopsis}
+          </Text>
+          <ScrollView
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            className="flex flex-row gap-x-2 overflow-scroll"
+          >
+            {metaData &&
+              metaData.genres.map((genre, i) => (
                 <View
                   key={i}
                   className="p-1 px-2 bg-[#2c2c2e]  text-base w-max rounded-lg"
@@ -141,10 +153,9 @@ export default function MangaDetailsPage() {
                   <Text className="text-gray-300">{genre}</Text>
                 </View>
               ))}
-            </ScrollView>
-          </View>
+          </ScrollView>
         </View>
-      )}
+      </View>
 
       {metaData && metaData.chapters && metaData.chapters.length > 0 && (
         <View className="mt-4">

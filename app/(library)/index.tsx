@@ -3,7 +3,7 @@ import MangaCard from "@/components/MangaCard";
 import ThemedScrollView from "@/components/ThemedScrollView";
 import { useEffect, useState } from "react";
 import { Pressable } from "react-native";
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import useAsyncStorage from "@/hooks/useAsyncStorage";
 import { subscribeAsyncStorageUpdated } from "@/utils/AsyncStorageEmitter";
 import { RefreshControl } from "react-native";
@@ -42,7 +42,7 @@ export default function Library() {
 
   const { getLibrary } = useAsyncStorage();
   const [storedData, setStoredData] = useState<MangaDetails[]>([]);
-
+  const router = useRouter();
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -78,15 +78,6 @@ export default function Library() {
     };
   }, []);
 
-  const clearAsyncStorage = async () => {
-    try {
-      await AsyncStorage.clear();
-      console.log("AsyncStorage cleared successfully");
-    } catch (e) {
-      console.error("Failed to clear AsyncStorage:", e);
-    }
-  };
-
   return (
     <ThemedScrollView
       className={`flex flex-col mt-32 ml-4`}
@@ -103,15 +94,23 @@ export default function Library() {
           // onSubmitEditing={getTrending}
         ></TextInput>
       </View>
-      <Pressable onPress={() => clearAsyncStorage()}>
-        <Text className="text-white text-3xl">Clear storage</Text>
-      </Pressable>
+
       <View className={`mt-4 flex flex-row flex-wrap justify-between mr-4`}>
         {storedData.length > 0
           ? storedData.map((item: any, index) => (
               <Pressable
                 key={index}
-                onPress={() => router.push(`(library)/${item.slug}`)}
+                onPress={() =>
+                  router.push({
+                    pathname: `(library)/${item.slug}`,
+                    params: {
+                      isBookmarked: item.isBookmarked,
+                      name: item.name,
+                      posterUrl: item.posterUrl,
+                      synopsis: item.synopsis,
+                    },
+                  })
+                }
               >
                 <MangaCard
                   key={index}
