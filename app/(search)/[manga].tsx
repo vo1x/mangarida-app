@@ -157,9 +157,10 @@ export default function MangaDetailsPage() {
         {chapters.length} Chapters
       </Text>
       {metaData?.chapters && metaData.chapters.length > 0 && (
-        <ScrollView className="h-full ">
+        <ScrollView className="h-full">
           {chapters.map((chapter) => (
             <Chapter
+              key={chapter.chNum}
               title={chapter.title}
               publishedOn={chapter.publishedOn}
             ></Chapter>

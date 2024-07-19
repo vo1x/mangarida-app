@@ -19,7 +19,7 @@ interface MangaDetails {
 
 interface ChapterResult {
   url: string;
-  title: string[];
+  title: string;
   publishedOn: string;
   chNum: number;
 }
