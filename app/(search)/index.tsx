@@ -24,7 +24,7 @@ export default function Search() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const getSearchResults = async () => {
     try {
-      const url = `http://192.168.1.73:5000/search?query=${searchValue}`;
+      const url = `http://192.168.1.103:5000/search?query=${searchValue}`;
       const { data } = await axios.get(url);
       setSearchResults(data.results);
     } catch (error) {

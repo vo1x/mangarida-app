@@ -10,7 +10,7 @@ export default function SearchLayout() {
       <Tabs.Screen
         name="[manga]"
         options={{
-          headerTitle: "Search",
+          headerTitle: "",
           headerStyle: { backgroundColor: "#000", borderBottomWidth: 0 },
           headerShadowVisible: false,
           headerTintColor: "#FE375E",

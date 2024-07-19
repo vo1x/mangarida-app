@@ -3,20 +3,21 @@ import { Stack, Tabs } from "expo-router";
 export default function LibraryLayout() {
   return (
     <Stack>
-      <Tabs.Screen
+      <Stack.Screen
         name="index"
-        options={{ href: null, title: "Library", headerShown: false }}
+        options={{
+          headerShown: false,
+          headerTitle: "Library",
+        }}
       />
-      <Tabs.Screen
+      <Stack.Screen
         name="[manga]"
         options={{
           headerTitle: "",
-          headerStyle: { backgroundColor: "#000", borderColor: "#000",  },
+          headerStyle: { backgroundColor: "#000", },
           headerShadowVisible: false,
-          headerTintColor:'#FE375E'
-          
+          headerTintColor: "#FE375E",
         }}
-        
       />
     </Stack>
   );
