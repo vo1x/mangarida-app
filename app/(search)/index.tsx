@@ -1,11 +1,10 @@
-import { View } from "react-native";
+import { View, Pressable } from "react-native";
 import SearchBar from "@/components/Searchbar";
 import ThemedScrollView from "@/components/ThemedScrollView";
 import Header from "@/components/Header";
 import { useState } from "react";
 import axios from "axios";
 import { router } from "expo-router";
-import { Pressable } from "react-native";
 import MangaCard from "@/components/MangaCard";
 
 interface SearchResult {
@@ -45,7 +44,7 @@ export default function Search() {
         {searchResults.length > 0
           ? searchResults.map((item: any, index) => (
               <Pressable
-                key={index}
+                key={item.slug}
                 onPress={() =>
                   router.push({
                     pathname: `(search)/${item.slug}`,
@@ -56,7 +55,7 @@ export default function Search() {
                 }
               >
                 <MangaCard
-                  key={index}
+                  key={item.slug}
                   title={item.name}
                   imgUrl={item.posterUrl}
                 />

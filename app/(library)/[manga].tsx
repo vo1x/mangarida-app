@@ -1,14 +1,9 @@
-import { View, Text, Image } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { View, Text, Image, Pressable, ScrollView } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Pressable } from "react-native";
 import { Bookmark, DownloadIcon } from "lucide-react-native";
-import { ScrollView } from "react-native";
-import { FlatList } from "react-native";
-
+import Chapter from "@/components/Chapter";
 interface MangaDetails {
   name: string;
   altNames: string[];
@@ -27,7 +22,7 @@ interface MangaDetails {
 
 interface ChapterResult {
   url: string;
-  title: string[];
+  title: string;
   publishedOn: string;
   chNum: number;
 }
@@ -109,16 +104,14 @@ export default function MangaDetailsPage() {
   };
 
   return (
-    <View className="mx-4 mt-4">
+    <View className="mx-4 h-full">
       <View className="flex flex-col ">
         <View className=" flex flex-row items-end  ">
           <Image source={{ uri: posterUrl }} className="w-32 h-48 rounded-lg" />
           <View className="ml-2">
             <Text className="text-white text-2xl font-semibold ">{name}</Text>
 
-            <Text className="text-gray-400">
-              {metaData && metaData.author.join(", ")}
-            </Text>
+            <Text className="text-gray-400">{metaData?.author.join(", ")}</Text>
             {metaData && metaData.chapters?.length > 0 && (
               <View className="flex flex-row items-center gap-2 mt-1">
                 <Pressable onPress={() => handleBookmark(metaData)}>
@@ -144,28 +137,31 @@ export default function MangaDetailsPage() {
             showsHorizontalScrollIndicator={false}
             className="flex flex-row gap-x-2 overflow-scroll"
           >
-            {metaData &&
-              metaData.genres.map((genre, i) => (
-                <View
-                  key={i}
-                  className="p-1 px-2 bg-[#2c2c2e]  text-base w-max rounded-lg"
-                >
-                  <Text className="text-gray-300">{genre}</Text>
-                </View>
-              ))}
+            {metaData?.genres.map((genre, i) => (
+              <View
+                key={genre}
+                className="p-1 px-2 bg-[#2c2c2e]  text-base w-max rounded-lg"
+              >
+                <Text className="text-gray-300">{genre}</Text>
+              </View>
+            ))}
           </ScrollView>
         </View>
       </View>
 
-      {metaData && metaData.chapters && metaData.chapters.length > 0 && (
-        <View className="mt-4">
-          <Text className="text-white text-2xl font-semibold mb-4">
-            {chapters.length} Chapters
-          </Text>
+      <Text className="text-white text-2xl font-semibold mt-2 py-2">
+        {chapters.length} Chapters
+      </Text>
+      {metaData?.chapters && metaData.chapters.length > 0 && (
+        <ScrollView className="h-full ">
           {chapters.map((chapter) => (
-            <Text className="text-white">{chapter.chNum}</Text>
+            <Chapter
+              key={chapter.chNum}
+              title={chapter.title}
+              publishedOn={chapter.publishedOn}
+            ></Chapter>
           ))}
-        </View>
+        </ScrollView>
       )}
     </View>
   );

@@ -1,13 +1,10 @@
-import { View, Text, Image } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
+import { View, Text, Image, ScrollView, Pressable } from "react-native";
 
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { Button, Pressable } from "react-native";
 import { Bookmark, DownloadIcon } from "lucide-react-native";
-import { ScrollView } from "react-native";
-import { FlatList } from "react-native";
+import Chapter from "@/components/Chapter";
 
 interface MangaDetails {
   name: string;
@@ -27,7 +24,7 @@ interface MangaDetails {
 
 interface ChapterResult {
   url: string;
-  title: string[];
+  title: string;
   publishedOn: string;
   chNum: number;
 }
@@ -103,7 +100,7 @@ export default function MangaDetailsPage() {
   };
 
   return (
-    <View className="mx-4 mt-4">
+    <View className="mx-4 h-full">
       {metaData && (
         <View className="flex flex-col ">
           <View className=" flex flex-row items-end  ">
@@ -146,7 +143,7 @@ export default function MangaDetailsPage() {
             >
               {metaData.genres.map((genre, i) => (
                 <View
-                  key={i}
+                  key={genre}
                   className="p-1 px-2 bg-[#2c2c2e]  text-base w-max rounded-lg"
                 >
                   <Text className="text-gray-300">{genre}</Text>
@@ -156,16 +153,18 @@ export default function MangaDetailsPage() {
           </View>
         </View>
       )}
-
-      {metaData && metaData.chapters && metaData.chapters.length > 0 && (
-        <View className="mt-4">
-          <Text className="text-white text-2xl font-semibold mb-4">
-            {chapters.length} Chapters
-          </Text>
+      <Text className="text-white text-2xl font-semibold mt-2 py-2">
+        {chapters.length} Chapters
+      </Text>
+      {metaData?.chapters && metaData.chapters.length > 0 && (
+        <ScrollView className="h-full ">
           {chapters.map((chapter) => (
-            <Text className="text-white">{chapter.chNum}</Text>
+            <Chapter
+              title={chapter.title}
+              publishedOn={chapter.publishedOn}
+            ></Chapter>
           ))}
-        </View>
+        </ScrollView>
       )}
     </View>
   );

@@ -1,18 +1,10 @@
-import { View, Text, TextInput, Button } from "react-native";
+import { View, Text, TextInput, Pressable, RefreshControl } from "react-native";
 import MangaCard from "@/components/MangaCard";
 import ThemedScrollView from "@/components/ThemedScrollView";
 import { useEffect, useState } from "react";
-import { Pressable } from "react-native";
 import { useRouter } from "expo-router";
 import useAsyncStorage from "@/hooks/useAsyncStorage";
 import { subscribeAsyncStorageUpdated } from "@/utils/AsyncStorageEmitter";
-import { RefreshControl } from "react-native";
-interface LatestChapter {
-  chNum: number;
-  volume: number;
-}
-
-import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface MangaDetails {
   name: string;
@@ -99,7 +91,7 @@ export default function Library() {
         {storedData.length > 0
           ? storedData.map((item: any, index) => (
               <Pressable
-                key={index}
+                key={item.slug}
                 onPress={() =>
                   router.push({
                     pathname: `(library)/${item.slug}`,
@@ -113,7 +105,7 @@ export default function Library() {
                 }
               >
                 <MangaCard
-                  key={index}
+                  key={item.slug}
                   title={item.name}
                   imgUrl={item.posterUrl}
                 />
