@@ -50,7 +50,7 @@ export default function MangaDetailsPage() {
 
   const getMetadata = async () => {
     try {
-      const url = `http://192.168.1.103:5000/manga/${manga}`;
+      const url = `http://192.168.1.73:5000/manga/${manga}`;
       const { data } = await axios.get(url);
       setMetadata(data);
     } catch (error) {
@@ -60,7 +60,7 @@ export default function MangaDetailsPage() {
 
   const getChapters = async () => {
     try {
-      const url = `http://192.168.1.103:5000/chapters/${manga}`;
+      const url = `http://192.168.1.73:5000/chapters/${manga}`;
       const { data } = await axios.get<{ chapters: ChapterResult[] }>(url);
 
       setMetadata((prev: MangaDetails | undefined) => ({

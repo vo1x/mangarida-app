@@ -1,12 +1,14 @@
-import { ScrollView, ScrollViewProps } from "react-native";
+import { SafeAreaView, ScrollView, ScrollViewProps } from "react-native";
 
 export default function ThemedScrollView({
   children,
   ...rest
 }: ScrollViewProps) {
   return (
-    <ScrollView className={`flex flex-col mt-24 mx-4 text-white`} {...rest}>
-      {children}
-    </ScrollView>
+    <SafeAreaView style={{ flex: 1 }}>
+      <ScrollView className={`flex flex-col mx-4 text-white mt-4`} {...rest}>
+        {children}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
