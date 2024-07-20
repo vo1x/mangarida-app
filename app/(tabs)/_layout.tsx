@@ -19,7 +19,6 @@ export default function TabsLayout() {
   return (
     <Tabs
       screenOptions={{
-        // headerShown: false,
         tabBarStyle: {
           position: "absolute",
         },
@@ -36,29 +35,6 @@ export default function TabsLayout() {
         ),
       }}
     >
-      {/* <Tabs.Screen
-        name="index"
-        options={{
-          title: "Library",
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name="library"
-              color={focused ? "#fff" : "#777"}
-              size={25}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="search"
-        options={{
-          title: "Search",
-          tabBarIcon: ({ color, focused }) => (
-            <SearchIcon color={focused ? "#fff" : "#777"} size={25} />
-          ),
-        }}
-      /> */}
-
       {TABS.map((tab, index) => (
         <Tabs.Screen
           key={"tab-" + index}

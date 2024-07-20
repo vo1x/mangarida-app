@@ -11,7 +11,6 @@ import "react-native-reanimated";
 import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Text, Pressable, View } from "react-native";
-import { Platform } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
