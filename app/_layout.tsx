@@ -40,20 +40,11 @@ export default function RootLayout() {
           options={{
             title: "",
             headerShown: true,
-            headerLeft: () => (
-              <Pressable
-                onPress={() => {
-                  router.back();
-                }}
-              >
-                {router.canGoBack() && (
-                  <View className="text-[#007AFF]  items-center flex flex-row">
-                    <Ionicons name="chevron-back" size={24} color="#007AFF" />
-                    <Text className="text-[#007AFF] text-lg">Back</Text>
-                  </View>
-                )}
-              </Pressable>
-            ),
+            headerTitle: "",
+            headerStyle: { backgroundColor: "#000" },
+            headerShadowVisible: false,
+            headerTintColor: "#1288ff",
+            headerBackTitle: "Back",
           }}
         />
         <Stack.Screen

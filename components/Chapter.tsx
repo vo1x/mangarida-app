@@ -5,10 +5,12 @@ const Chapter = ({
   title,
   publishedOn,
   chNum,
+  slug,
 }: {
   title: string;
   publishedOn: string;
-  chNum?: number;
+  chNum: number;
+  slug: string;
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -23,7 +25,10 @@ const Chapter = ({
       onPress={() => {
         router.push({
           pathname: "/reader",
-          params: { backTitle: getBackTitle() },
+          params: {
+            slug: slug,
+            chNum: chNum,
+          },
         });
       }}
     >

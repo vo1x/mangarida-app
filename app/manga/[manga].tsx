@@ -159,9 +159,11 @@ export default function MangaDetailsPage() {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
           {chapters.map((chapter) => (
             <Chapter
-              key={chapter.chNum}
+              key={chapter.title}
               title={chapter.title}
               publishedOn={chapter.publishedOn}
+              chNum={chapter.chNum}
+              slug={manga!}
             ></Chapter>
           ))}
         </ScrollView>
