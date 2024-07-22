@@ -11,6 +11,7 @@ import "react-native-reanimated";
 import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { Text, Pressable, View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -32,34 +33,36 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack>
-        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-        <Stack.Screen
-          name="reader"
-          options={{
-            title: "",
-            headerShown: true,
-            headerTitle: "",
-            headerStyle: { backgroundColor: "#000" },
-            headerShadowVisible: false,
-            headerTintColor: "#1288ff",
-            headerBackTitle: "Back",
-          }}
-        />
-        <Stack.Screen
-          name="manga/[manga]"
-          options={{
-            title: "",
-            headerShown: true,
-            headerTitle: "",
-            headerStyle: { backgroundColor: "#000" },
-            headerShadowVisible: false,
-            headerTintColor: "#1288ff",
-            headerBackTitle: "Back",
-          }}
-        />
-      </Stack>
-    </ThemeProvider>
+    <GestureHandlerRootView>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack>
+          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen
+            name="reader"
+            options={{
+              title: "",
+              headerShown: false,
+              headerTitle: "",
+              headerStyle: { backgroundColor: "#000" },
+              headerShadowVisible: false,
+              headerTintColor: "#1288ff",
+              headerBackTitle: "Back",
+            }}
+          />
+          <Stack.Screen
+            name="manga/[manga]"
+            options={{
+              title: "",
+              headerShown: true,
+              headerTitle: "",
+              headerStyle: { backgroundColor: "#000" },
+              headerShadowVisible: false,
+              headerTintColor: "#1288ff",
+              headerBackTitle: "Back",
+            }}
+          />
+        </Stack>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

@@ -15,6 +15,7 @@ import { subscribeAsyncStorageUpdated } from "@/utils/AsyncStorageEmitter";
 import { ScrollView } from "react-native";
 
 import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import useStore from "@/stores/libraryStore";
 
 interface MangaDetails {
   name: string;
@@ -42,14 +43,14 @@ interface ChapterResult {
 export default function Library() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
-  const { getLibrary } = useAsyncStorage();
-  const [storedData, setStoredData] = useState<MangaDetails[]>([]);
+  const loadLibrary = useStore((state) => state.loadLibrary);
+  const library = useStore((state) => state.library);
+
   const router = useRouter();
   const onRefresh = async () => {
     setRefreshing(true);
     try {
-      const newData = await getLibrary();
-      setStoredData(newData);
+      await loadLibrary();
     } catch (error) {
       console.error("Error retrieving data:", error);
     } finally {
@@ -57,37 +58,23 @@ export default function Library() {
     }
   };
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const newData = await getLibrary();
-        setStoredData(newData);
+        await loadLibrary();
       } catch (error) {
         console.error("Error fetching initial data:", error);
       }
     };
-
-    const handleAsyncStorageUpdate = () => {
-      fetchData();
-    };
-
-    const unsubscribe = subscribeAsyncStorageUpdated(handleAsyncStorageUpdate);
-
     fetchData();
-
-    return () => {
-      unsubscribe();
-    };
   }, []);
 
   return (
     <ThemedScrollView
-      // className={`flex flex-col`}
       refreshControl={
         <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
       }
-
-      // stickyHeaderIndices={[0]}
     >
       <View>
         <Text className="text-white text-3xl font-semibold">Library</Text>
@@ -100,31 +87,33 @@ export default function Library() {
       </View>
 
       <View className={`mt-4 flex flex-row flex-wrap justify-between mr-4`}>
-        {storedData.length > 0
-          ? storedData.map((item: any, index) => (
-              <Pressable
+        {library.length > 0 ? (
+          library.map((item: any, index) => (
+            <Pressable
+              key={item.slug}
+              onPress={() =>
+                router.push({
+                  pathname: `/manga/${item.slug}`,
+                  params: {
+                    isBookmarked: item.isBookmarked,
+                    name: item.name,
+                    posterUrl: item.posterUrl,
+                    synopsis: item.synopsis,
+                    author: item.author.join(", "),
+                  },
+                })
+              }
+            >
+              <MangaCard
                 key={item.slug}
-                onPress={() =>
-                  router.push({
-                    pathname: `/manga/${item.slug}`,
-                    params: {
-                      isBookmarked: item.isBookmarked,
-                      name: item.name,
-                      posterUrl: item.posterUrl,
-                      synopsis: item.synopsis,
-                      author: item.author.join(", "),
-                    },
-                  })
-                }
-              >
-                <MangaCard
-                  key={item.slug}
-                  title={item.name}
-                  imgUrl={item.posterUrl}
-                />
-              </Pressable>
-            ))
-          : null}
+                title={item.name}
+                imgUrl={item.posterUrl}
+              />
+            </Pressable>
+          ))
+        ) : (
+          <Text className="text-white text-2xl">Nothing in library</Text>
+        )}
       </View>
     </ThemedScrollView>
   );
