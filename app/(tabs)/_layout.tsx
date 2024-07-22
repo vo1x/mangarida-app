@@ -41,6 +41,7 @@ export default function TabsLayout() {
           name={tab.name}
           options={{
             tabBarLabel: tab.label,
+            headerShown: false,
             tabBarIcon: ({ color, focused }) => (
               <Ionicons
                 style={{ marginBottom: -3 }}

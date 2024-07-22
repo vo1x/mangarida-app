@@ -1,10 +1,12 @@
-import { View, Text, Image, Pressable, ScrollView } from "react-native";
+import { View, Text, Image, Pressable, ScrollView, Button } from "react-native";
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { Bookmark, DownloadIcon } from "lucide-react-native";
-import { SafeAreaView } from "react-native";
+
 import Chapter from "@/components/Chapter";
+import { SafeAreaView, FlatList } from "react-native";
+
 interface MangaDetails {
   name: string;
   altNames: string[];
@@ -28,29 +30,23 @@ interface ChapterResult {
   chNum: number;
 }
 
-interface MangaParams extends Record<string, string> {
-  isBookmarked: string;
-  manga: string;
-  name: string;
-  posterUrl: string;
-  synopsis: string;
-  author: string;
+interface SearchParams extends Record<string, string> {
+  mangaTitle: string;
 }
 
-import ThemedScrollView from "@/components/ThemedScrollView";
 import useStore from "../../stores/libraryStore";
 
 export default function MangaDetailsPage() {
-  const params = useLocalSearchParams<MangaParams>();
-  const isBookmarked = params.isBookmarked === "true";
-  const manga = params.manga;
+  const { manga } = useLocalSearchParams<{ manga: string }>();
+  const params = useLocalSearchParams<SearchParams>();
+  const { mangaTitle } = params;
   const [metaData, setMetadata] = useState<MangaDetails>();
 
   const bookmarkManga = useStore((state) => state.bookmarkManga);
 
   const getMetadata = async () => {
     try {
-      const url = `http://192.168.1.73:5000/manga/${manga}`;
+      const url = `/manga/${manga}`;
       const { data } = await axios.get(url);
       return data;
     } catch (error) {
@@ -60,7 +56,7 @@ export default function MangaDetailsPage() {
 
   const getChapters = async () => {
     try {
-      const url = `http://192.168.1.73:5000/chapters/${manga}`;
+      const url = `/chapters/${manga}`;
       const { data } = await axios.get<{ chapters: ChapterResult[] }>(url);
 
       return data.chapters;
@@ -69,7 +65,7 @@ export default function MangaDetailsPage() {
     }
   };
 
-  const [bookmarked, setBookmarked] = useState<boolean>(isBookmarked);
+  const [bookmarked, setBookmarked] = useState<boolean>(false);
 
   const isInLibrary = useStore((state) => state.checkMangaExistsInLibrary);
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
@@ -81,7 +77,6 @@ export default function MangaDetailsPage() {
         if (isBookmarked) {
           setBookmarked(isBookmarked);
           const metadata = await getMangaFromLibrary(manga!);
-          // console.log(JSON.stringify(metadata, null, 2));
           if (metadata) setMetadata(metadata);
         } else {
           setBookmarked(isBookmarked);
@@ -107,21 +102,21 @@ export default function MangaDetailsPage() {
   };
 
   return (
-    <ThemedScrollView className="mx-4 h-full">
+    <SafeAreaView className="mx-4 h-full mt-4">
       <View className="flex flex-col ">
         <View className=" flex flex-row items-end  ">
           <Image
             source={{ uri: metaData?.posterUrl }}
-            className="w-32 h-48 rounded-lg"
+            className="w-28 h-44 rounded-lg object-contain"
           />
           <View className="ml-2 flex-1">
             <Text className="text-white text-xl font-semibold ">
-              {metaData?.name}
+              {mangaTitle ?? metaData?.name}
             </Text>
             <Text className="text-gray-400">
               {metaData?.author?.join(", ")}
             </Text>
-            {metaData && metaData.chapters?.length > 0 && (
+            {metaData && metaData.chapters.length > 0 && (
               <View className="flex flex-row items-center gap-2 mt-1">
                 <Pressable onPress={() => handleBookmark(metaData)}>
                   <Bookmark
@@ -137,8 +132,8 @@ export default function MangaDetailsPage() {
             )}
           </View>
         </View>
-        <View className="mt-4">
-          <Text className="text-white text-base mb-4" numberOfLines={3}>
+        <View className="mt-2">
+          <Text className="text-neutral-400 text-base mb-4" numberOfLines={3}>
             {metaData?.synopsis}
           </Text>
           <ScrollView
@@ -155,25 +150,44 @@ export default function MangaDetailsPage() {
               </View>
             ))}
           </ScrollView>
+          <Pressable
+            onPress={() => {}}
+            style={{
+              backgroundColor: `#1288ff`,
+            }}
+            className="p-2 rounded-xl my-2 mt-4"
+            // className="text-white bg-[#1288ff] py-2 px-2 rounded-xl"
+          >
+            <Text className="text-white  text-center text-base ">
+              {`Start Reading Ch.${
+                metaData?.chapters[metaData?.chapters.length - 1].chNum
+              }`}
+            </Text>
+          </Pressable>
         </View>
       </View>
 
-      <Text className="text-white text-2xl font-semibold mt-2 py-2">
-        {metaData?.chapters.length} Chapters
-      </Text>
-      {metaData && metaData.chapters.length > 0 && (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-          {metaData.chapters.map((chapter) => (
-            <Chapter
-              key={chapter.title}
-              title={chapter.title}
-              publishedOn={chapter.publishedOn}
-              chNum={chapter.chNum}
-              slug={manga!}
-            ></Chapter>
-          ))}
-        </ScrollView>
-      )}
-    </ThemedScrollView>
+      <FlatList
+        data={metaData?.chapters}
+        ItemSeparatorComponent={() => (
+          <View className="border border-[#2c2c2e] my-2 border-0.5" />
+        )}
+        ListHeaderComponent={() => (
+          <Text className="text-white text-xl font-semibold py-2 bg-black">
+            {metaData?.chapters.length ?? 0} Chapters
+          </Text>
+        )}
+        stickyHeaderIndices={[0]}
+        renderItem={({ item }) => (
+          <Chapter
+            key={item.title}
+            title={item.title}
+            publishedOn={item.publishedOn}
+            chNum={item.chNum}
+            slug={manga!}
+          />
+        )}
+      />
+    </SafeAreaView>
   );
 }

@@ -58,7 +58,6 @@ export default function Library() {
     }
   };
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -89,27 +88,12 @@ export default function Library() {
       <View className={`mt-4 flex flex-row flex-wrap justify-between mr-4`}>
         {library.length > 0 ? (
           library.map((item: any, index) => (
-            <Pressable
+            <MangaCard
               key={item.slug}
-              onPress={() =>
-                router.push({
-                  pathname: `/manga/${item.slug}`,
-                  params: {
-                    isBookmarked: item.isBookmarked,
-                    name: item.name,
-                    posterUrl: item.posterUrl,
-                    synopsis: item.synopsis,
-                    author: item.author.join(", "),
-                  },
-                })
-              }
-            >
-              <MangaCard
-                key={item.slug}
-                title={item.name}
-                imgUrl={item.posterUrl}
-              />
-            </Pressable>
+              title={item.name}
+              imgUrl={item.posterUrl}
+              slug={item.slug}
+            />
           ))
         ) : (
           <Text className="text-white text-2xl">Nothing in library</Text>

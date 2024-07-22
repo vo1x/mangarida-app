@@ -4,14 +4,15 @@ import {
   ThemeProvider,
 } from "@react-navigation/native";
 import { useFonts } from "expo-font";
-import { Ionicons } from "@expo/vector-icons";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 import "react-native-reanimated";
 import { Stack, useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { Text, Pressable, View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
+import axios from "axios";
+
+axios.defaults.baseURL = "http://192.168.1.73:5000";
 
 SplashScreen.preventAutoHideAsync();
 

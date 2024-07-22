@@ -23,7 +23,7 @@ export default function Search() {
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
   const getSearchResults = async () => {
     try {
-      const url = `http://192.168.1.73:5000/search?query=${searchValue}`;
+      const url = `/search?query=${searchValue}`;
       const { data } = await axios.get(url);
       setSearchResults(data.results);
     } catch (error) {
@@ -43,23 +43,12 @@ export default function Search() {
       <View className={`mt-8 flex flex-row flex-wrap justify-between mr-4`}>
         {searchResults.length > 0
           ? searchResults.map((item: any, index) => (
-              <Pressable
+              <MangaCard
                 key={item.slug}
-                onPress={() =>
-                  router.push({
-                    pathname: `/manga/${item.slug}`,
-                    params: {
-                      isBookmarked: item.isBookmarked,
-                    },
-                  })
-                }
-              >
-                <MangaCard
-                  key={item.slug}
-                  title={item.name}
-                  imgUrl={item.posterUrl}
-                />
-              </Pressable>
+                title={item.name}
+                imgUrl={item.posterUrl}
+                slug={item.slug}
+              />
             ))
           : null}
       </View>

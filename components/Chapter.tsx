@@ -32,8 +32,8 @@ const Chapter = ({
         });
       }}
     >
-      <Text className="text-white text-lg">{title}</Text>
-      <Text className="text-gray-300">{publishedOn}</Text>
+      <Text className="text-white text-base">{title}</Text>
+      <Text className="text-neutral-400">{publishedOn}</Text>
     </Pressable>
   );
 };
