@@ -11,7 +11,6 @@ import {
 import { useEffect, useState } from "react";
 
 import { useLocalSearchParams } from "expo-router";
-import axios from "axios";
 
 import { Bookmark } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
