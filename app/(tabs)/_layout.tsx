@@ -7,7 +7,7 @@ import { ComponentProps } from "react";
 interface TabItem {
   name: string;
   label: string;
-  iconName: ComponentProps<typeof Ionicons>["name"]; // Assuming iconName is the actual property meant for Ionicons
+  iconName: ComponentProps<typeof Ionicons>["name"]; 
 }
 
 const TABS: TabItem[] = [

@@ -1,44 +1,8 @@
-import {
-  View,
-  Text,
-  TextInput,
-  Pressable,
-  RefreshControl,
-  SafeAreaView,
-} from "react-native";
+import { View, Text, TextInput, RefreshControl } from "react-native";
 import MangaCard from "@/components/MangaCard";
 import ThemedScrollView from "@/components/ThemedScrollView";
 import { useEffect, useState } from "react";
-import { useRouter } from "expo-router";
-import useAsyncStorage from "@/hooks/useAsyncStorage";
-import { subscribeAsyncStorageUpdated } from "@/utils/AsyncStorageEmitter";
-import { ScrollView } from "react-native";
-
-import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import useStore from "@/stores/libraryStore";
-
-interface MangaDetails {
-  name: string;
-  altNames: string[];
-  status: string;
-  type: string;
-  synopsis: string;
-  posterUrl: string;
-  author: string[];
-  publishedOn: string;
-  genres: string[];
-  mangazines: string[];
-  chapters: ChapterResult[];
-  slug: string | undefined;
-  isBookmarked: boolean;
-}
-
-interface ChapterResult {
-  url: string;
-  title: string[];
-  publishedOn: string;
-  chNum: number;
-}
 
 export default function Library() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
@@ -46,7 +10,6 @@ export default function Library() {
   const loadLibrary = useStore((state) => state.loadLibrary);
   const library = useStore((state) => state.library);
 
-  const router = useRouter();
   const onRefresh = async () => {
     setRefreshing(true);
     try {
@@ -81,7 +44,6 @@ export default function Library() {
           placeholder="Find something"
           placeholderTextColor="#9ca3af"
           className="bg-[#2c2c2e] rounded-lg text-[18px] text-white p-2 mt-2 w-full"
-          // onSubmitEditing={getTrending}
         ></TextInput>
       </View>
 

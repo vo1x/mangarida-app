@@ -1,11 +1,26 @@
-import { View, Text, Image, Pressable, ScrollView, Button } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  Pressable,
+  ScrollView,
+  SafeAreaView,
+  FlatList,
+} from "react-native";
+
+import { useEffect, useState } from "react";
+
 import { useLocalSearchParams } from "expo-router";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Bookmark, DownloadIcon } from "lucide-react-native";
+
+import { Bookmark } from "lucide-react-native";
+import { Ionicons } from "@expo/vector-icons";
 
 import Chapter from "@/components/Chapter";
-import { SafeAreaView, FlatList } from "react-native";
+
+import useStore from "../../stores/libraryStore";
+
+import useMangarida from "@/hooks/useMangarida";
 
 interface MangaDetails {
   name: string;
@@ -34,41 +49,19 @@ interface SearchParams extends Record<string, string> {
   mangaTitle: string;
 }
 
-import useStore from "../../stores/libraryStore";
-
 export default function MangaDetailsPage() {
   const { manga } = useLocalSearchParams<{ manga: string }>();
   const params = useLocalSearchParams<SearchParams>();
   const { mangaTitle } = params;
+
   const [metaData, setMetadata] = useState<MangaDetails>();
-
-  const bookmarkManga = useStore((state) => state.bookmarkManga);
-
-  const getMetadata = async () => {
-    try {
-      const url = `/manga/${manga}`;
-      const { data } = await axios.get(url);
-      return data;
-    } catch (error) {
-      console.error("Error fetching trending data:", error);
-    }
-  };
-
-  const getChapters = async () => {
-    try {
-      const url = `/chapters/${manga}`;
-      const { data } = await axios.get<{ chapters: ChapterResult[] }>(url);
-
-      return data.chapters;
-    } catch (error) {
-      console.error("Error fetching chapters:", error);
-    }
-  };
-
   const [bookmarked, setBookmarked] = useState<boolean>(false);
 
+  const bookmarkManga = useStore((state) => state.bookmarkManga);
   const isInLibrary = useStore((state) => state.checkMangaExistsInLibrary);
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
+
+  const { getMetadata, getChapters } = useMangarida();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -80,8 +73,8 @@ export default function MangaDetailsPage() {
           if (metadata) setMetadata(metadata);
         } else {
           setBookmarked(isBookmarked);
-          const metadata = await getMetadata();
-          const chapters = await getChapters();
+          const metadata = await getMetadata(manga!);
+          const chapters = await getChapters(manga!);
           setMetadata({
             ...metadata,
             chapters: chapters,
@@ -113,20 +106,25 @@ export default function MangaDetailsPage() {
             <Text className="text-white text-xl font-semibold ">
               {mangaTitle ?? metaData?.name}
             </Text>
-            <Text className="text-gray-400">
-              {metaData?.author?.join(", ")}
-            </Text>
+            <Text className="text-gray-400">{metaData?.author.join(", ")}</Text>
             {metaData && metaData.chapters.length > 0 && (
               <View className="flex flex-row items-center gap-2 mt-1">
-                <Pressable onPress={() => handleBookmark(metaData)}>
+                <Pressable
+                  className="bg-[#1c1c1e] p-2 rounded-lg"
+                  onPress={() => handleBookmark(metaData)}
+                >
                   <Bookmark
                     color={"#1288ff"}
                     fill={bookmarked ? "#1288ff" : "none"}
-                    size={30}
+                    size={24}
                   />
                 </Pressable>
-                <Pressable>
-                  <DownloadIcon color={"#1288ff"} size={30} />
+                <Pressable className="bg-[#1c1c1e] p-2 rounded-lg">
+                  <Ionicons
+                    name="download"
+                    size={24}
+                    color={"#1288ff"}
+                  ></Ionicons>
                 </Pressable>
               </View>
             )}
@@ -156,12 +154,13 @@ export default function MangaDetailsPage() {
               backgroundColor: `#1288ff`,
             }}
             className="p-2 rounded-xl my-2 mt-4"
-            // className="text-white bg-[#1288ff] py-2 px-2 rounded-xl"
           >
             <Text className="text-white  text-center text-base ">
-              {`Start Reading Ch.${
-                metaData?.chapters[metaData?.chapters.length - 1].chNum
-              }`}
+              {metaData && metaData.chapters.length > 0
+                ? `Start Reading Ch.${
+                    metaData.chapters[metaData.chapters.length - 1].chNum
+                  }`
+                : "No chapters found"}
             </Text>
           </Pressable>
         </View>

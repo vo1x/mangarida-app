@@ -1,11 +1,12 @@
-import { View, Pressable } from "react-native";
+import { useState } from "react";
+import { View } from "react-native";
+
 import SearchBar from "@/components/Searchbar";
 import ThemedScrollView from "@/components/ThemedScrollView";
 import Header from "@/components/Header";
-import { useState } from "react";
-import axios from "axios";
-import { router } from "expo-router";
 import MangaCard from "@/components/MangaCard";
+
+import useMangarida from "@/hooks/useMangarida";
 
 interface SearchResult {
   name: string;
@@ -21,14 +22,12 @@ export default function Search() {
   };
 
   const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
-  const getSearchResults = async () => {
-    try {
-      const url = `/search?query=${searchValue}`;
-      const { data } = await axios.get(url);
-      setSearchResults(data.results);
-    } catch (error) {
-      console.error("Error fetching trending data:", error);
-    }
+
+  const { getSearchResults } = useMangarida();
+
+  const handleSearch = async () => {
+    const searchRes = await getSearchResults(searchValue);
+    setSearchResults(searchRes);
   };
 
   return (
@@ -37,7 +36,7 @@ export default function Search() {
         <Header text={"Search"} />
         <SearchBar
           onChangeText={handleSearchInput}
-          onSubmitEditing={getSearchResults}
+          onSubmitEditing={handleSearch}
         />
       </View>
       <View className={`mt-8 flex flex-row flex-wrap justify-between mr-4`}>
