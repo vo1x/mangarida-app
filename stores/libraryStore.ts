@@ -2,13 +2,17 @@ import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 interface MangaDetails {
-  name: string;
+  title: string;
   altNames: string[];
   status: string;
   type: string;
   synopsis: string;
-  posterUrl: string;
-  author: string[];
+  cover: {
+    height: number;
+    width: number;
+    url: string;
+  };
+  authors: string[];
   publishedOn: string;
   genres: string[];
   mangazines: string[];
@@ -18,10 +22,14 @@ interface MangaDetails {
 }
 
 interface ChapterResult {
-  url: string;
+  chId: string;
+  chNum: string;
   title: string;
-  publishedOn: string;
-  chNum: number;
+  volume: string;
+  language: string;
+  createdAt: string;
+  isLastCh: string;
+  groupName: string;
 }
 
 interface StoreState {

@@ -22,13 +22,17 @@ import useStore from "../../stores/libraryStore";
 import useMangarida from "@/hooks/useMangarida";
 
 interface MangaDetails {
-  name: string;
+  title: string;
   altNames: string[];
   status: string;
   type: string;
   synopsis: string;
-  posterUrl: string;
-  author: string[];
+  cover: {
+    height: number;
+    width: number;
+    url: string;
+  };
+  authors: string[];
   publishedOn: string;
   genres: string[];
   mangazines: string[];
@@ -38,10 +42,14 @@ interface MangaDetails {
 }
 
 interface ChapterResult {
-  url: string;
+  chId: string;
+  chNum: string;
   title: string;
-  publishedOn: string;
-  chNum: number;
+  volume: string;
+  language: string;
+  createdAt: string;
+  isLastCh: string;
+  groupName: string;
 }
 
 interface SearchParams extends Record<string, string> {
@@ -60,33 +68,54 @@ export default function MangaDetailsPage() {
   const isInLibrary = useStore((state) => state.checkMangaExistsInLibrary);
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
 
-  const { getMetadata, getChapters } = useMangarida();
+  const { useMetadata, useChapters } = useMangarida();
+  const slug = manga!.split("|")[0].trim();
+
+  const { data: metadataData, isLoading: isMetadataLoading } =
+    useMetadata(slug);
+  const { data: chaptersData, isLoading: isChaptersLoading } =
+    useChapters(slug);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const isBookmarked = await isInLibrary(manga!);
-        if (isBookmarked) {
-          setBookmarked(isBookmarked);
-          const metadata = await getMangaFromLibrary(manga!);
-          if (metadata) setMetadata(metadata);
-        } else {
-          setBookmarked(isBookmarked);
-          const metadata = await getMetadata(manga!);
-          const chapters = await getChapters(manga!);
-          setMetadata({
-            ...metadata,
-            chapters: chapters,
-            slug: manga!,
-          });
-        }
-      } catch (error) {
-        console.error("Error", error);
+    const checkBookmark = async () => {
+      const isBookmarked = await isInLibrary(slug);
+      setBookmarked(isBookmarked);
+
+      if (isBookmarked) {
+        const bookmarkedMetadata = await getMangaFromLibrary(slug);
+        if (bookmarkedMetadata) setMetadata(bookmarkedMetadata);
       }
     };
 
-    fetchData();
-  }, []);
+    checkBookmark();
+  }, [manga]);
+
+  useEffect(() => {
+    if (
+      !bookmarked &&
+      !isMetadataLoading &&
+      !isChaptersLoading &&
+      metadataData &&
+      chaptersData
+    ) {
+      setMetadata({
+        ...metadataData,
+        chapters: chaptersData,
+        slug: manga,
+      });
+    }
+  }, [
+    bookmarked,
+    isMetadataLoading,
+    isChaptersLoading,
+    metadataData,
+    chaptersData,
+    manga,
+  ]);
+
+  if (isMetadataLoading || isChaptersLoading) {
+    return <Text>Loading...</Text>;
+  }
 
   const handleBookmark = async (metaData: MangaDetails) => {
     await bookmarkManga(metaData);
@@ -98,15 +127,17 @@ export default function MangaDetailsPage() {
       <View className="flex flex-col ">
         <View className=" flex flex-row items-end  ">
           <Image
-            source={{ uri: metaData?.posterUrl }}
+            source={{ uri: metaData?.cover.url }}
             className="w-28 h-44 rounded-lg object-contain"
           />
           <View className="ml-2 flex-1">
             <Text className="text-white text-xl font-semibold ">
-              {mangaTitle ?? metaData?.name}
+              {mangaTitle ?? metaData?.title}
             </Text>
-            <Text className="text-gray-400">{metaData?.author.join(", ")}</Text>
-            {metaData && metaData.chapters.length > 0 && (
+            <Text className="text-gray-400">
+              {metaData?.authors.join(", ")}
+            </Text>
+            {metaData && metaData.chapters.length > 0 ? (
               <View className="flex flex-row items-center gap-2 mt-1">
                 <Pressable
                   className="bg-[#1c1c1e] p-2 rounded-lg"
@@ -126,14 +157,14 @@ export default function MangaDetailsPage() {
                   ></Ionicons>
                 </Pressable>
               </View>
-            )}
+            ) : null}
           </View>
         </View>
         <View className="mt-2">
           <Text className="text-neutral-400 text-base mb-4" numberOfLines={3}>
             {metaData?.synopsis}
           </Text>
-          <ScrollView
+          {/* <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             className="flex flex-row gap-x-2 overflow-scroll"
@@ -146,7 +177,7 @@ export default function MangaDetailsPage() {
                 <Text className="text-gray-300">{genre}</Text>
               </View>
             ))}
-          </ScrollView>
+          </ScrollView> */}
           <Pressable
             onPress={() => {}}
             style={{
@@ -179,9 +210,15 @@ export default function MangaDetailsPage() {
         renderItem={({ item }) => (
           <Chapter
             key={item.title}
-            title={item.title}
-            publishedOn={item.publishedOn}
-            chNum={item.chNum}
+            title={
+              item.title === null
+                ? item.chNum === null
+                  ? "Chapter"
+                  : `Chapter ${item.chNum}`
+                : `Chapter ${item.chNum ?? ""}: ${item.title}`
+            }
+            publishedOn={item.createdAt}
+            chNum={parseInt(item.chNum)}
             slug={manga!}
           />
         )}

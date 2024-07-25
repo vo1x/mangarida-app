@@ -4,19 +4,25 @@ import { router } from "expo-router";
 
 const MangaCard = ({
   title,
-  imgUrl,
+  mangaID,
+  coverUrl,
   slug,
+  source,
+  contentRating,
 }: {
   title: string;
-  imgUrl: string;
+  mangaID: string;
+  coverUrl: string;
   slug: string;
+  source: string;
+  contentRating: string;
 }) => {
   return (
-    imgUrl !== "" && (
+    coverUrl !== "" && (
       <Pressable
         onPress={() =>
           router.push({
-            pathname: `/manga/${slug}`,
+            pathname: `/manga/${mangaID + '|'+ slug}`,
             params: {
               mangaTitle: title,
             },
@@ -25,7 +31,10 @@ const MangaCard = ({
       >
         <View className="flex flex-col gap-2 mb-8">
           <View className="relative">
-            <Image source={{ uri: imgUrl }} className="w-44 h-72 rounded-lg" />
+            <Image
+              source={{ uri: coverUrl }}
+              className="w-44 h-72 rounded-lg"
+            />
           </View>
           <Text className="text-white  w-40 font-semibold" numberOfLines={2}>
             {title}
