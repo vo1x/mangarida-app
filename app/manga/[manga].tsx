@@ -220,6 +220,7 @@ export default function MangaDetailsPage() {
             publishedOn={item.createdAt}
             chNum={parseInt(item.chNum)}
             slug={manga!}
+            chID={item.chId}
           />
         )}
       />

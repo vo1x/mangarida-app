@@ -17,8 +17,8 @@ interface ChapterResult {
 
 const useMangarida = () => {
   const notifyOnChangeProps = useFocusNotifyOnChangeProps();
-  const getChapterPages = async (slug: string, chNum: string) => {
-    const url = `/read/${slug}/chapter-${chNum}`;
+  const getChapterPages = async (chID: string) => {
+    const url = `/read/${chID}`;
     const { data } = await axios.get(url);
     if (data) {
       return data.pages;
@@ -46,16 +46,15 @@ const useMangarida = () => {
   };
 
   const useChapterPages = (
-    slug: string,
-    chNum: string,
+    chID: string,
     options?: Omit<
       UseQueryOptions<any, Error, any, string[]>,
       "queryKey" | "queryFn"
     >
   ) =>
     useQuery({
-      queryKey: ["chapterPages", slug, chNum],
-      queryFn: () => getChapterPages(slug, chNum),
+      queryKey: ["chapterPages", chID],
+      queryFn: () => getChapterPages(chID),
       staleTime: 5 * 60 * 1000,
       gcTime: 60 * 60 * 1000,
       notifyOnChangeProps,

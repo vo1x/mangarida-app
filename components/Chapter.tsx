@@ -6,11 +6,13 @@ const Chapter = ({
   publishedOn,
   chNum,
   slug,
+  chID,
 }: {
   title: string;
   publishedOn: string;
   chNum: number;
   slug: string;
+  chID: string;
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -26,7 +28,7 @@ const Chapter = ({
         router.push({
           pathname: "/reader",
           params: {
-            slug: slug,
+            chID: chID,
             chNum: chNum,
           },
         });

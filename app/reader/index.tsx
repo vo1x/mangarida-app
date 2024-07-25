@@ -6,8 +6,7 @@ import Page from "@/components/Page";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 interface ReaderParams extends Record<string, string> {
-  slug: string;
-  chNum: string;
+  chID: string;
 }
 
 interface Page {
@@ -17,7 +16,7 @@ interface Page {
 
 const Reader = () => {
   const params = useLocalSearchParams<ReaderParams>();
-  const slug = params.slug;
+  const chID = params.chID;
   const chNum = params.chNum;
   const [isViewed, setIsViewed] = useState<boolean>(false);
   const navigation = useNavigation();
@@ -28,9 +27,8 @@ const Reader = () => {
 
   const doubleTap = Gesture.Tap().numberOfTaps(2).onStart(handleDoubleTap);
 
-  const [pages, setPages] = useState<Page[]>([]);
-
-  const { getChapterPages } = useMangarida();
+  const { useChapterPages } = useMangarida();
+  const { data: pages = [] } = useChapterPages(chID!);
 
   useEffect(() => {
     navigation.setOptions({
@@ -42,23 +40,16 @@ const Reader = () => {
     navigation.setOptions({
       headerTitle: `Chapter ${chNum}`,
     });
-
-    const fetchInfo = async () => {
-      const pgs = await getChapterPages(slug!, chNum!);
-      setPages(pgs);
-    };
-
-    fetchInfo();
   }, []);
 
   return (
     <GestureDetector gesture={doubleTap}>
       <ScrollView>
         <Text className="text-white">this is a read</Text>
-        <Text className="text-white">{slug}</Text>
+        <Text className="text-white">{chID}</Text>
         <Text className="text-white">{chNum}</Text>
         {pages.length > 0 &&
-          pages.map((page) => <Page key={page.pgNum} url={page.url} />)}
+          pages.map((page: any) => <Page key={page.pgNum} url={page.url} />)}
       </ScrollView>
     </GestureDetector>
   );
