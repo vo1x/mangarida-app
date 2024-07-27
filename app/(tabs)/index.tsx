@@ -3,11 +3,12 @@ import MangaCard from "@/components/MangaCard";
 import ThemedScrollView from "@/components/ThemedScrollView";
 import { useEffect, useState } from "react";
 import useStore from "@/stores/libraryStore";
-
+import useReadChaptersStore from "@/stores/readChaptersStore";
 export default function Library() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const loadLibrary = useStore((state) => state.loadLibrary);
+  
   const library = useStore((state) => state.library);
 
   const onRefresh = async () => {

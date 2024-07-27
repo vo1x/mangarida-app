@@ -68,14 +68,24 @@ export default function MangaDetailsPage() {
   const isInLibrary = useStore((state) => state.checkMangaExistsInLibrary);
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
 
-
   const { useMetadata, useChapters } = useMangarida();
   const slug = manga!.split("|")[0].trim();
+  const loadReadChaptersLibrary = useReadChaptersStore(
+    (state) => state.loadReadChapterLibrary
+  );
+  const readChapters = useReadChaptersStore((state) => state.readChapters);
 
   const { data: metadataData, isLoading: isMetadataLoading } =
     useMetadata(slug);
   const { data: chaptersData, isLoading: isChaptersLoading } =
     useChapters(slug);
+
+  useEffect(() => {
+    const load = async () => {
+      await loadReadChaptersLibrary();
+    };
+    load();
+  }, []);
 
   useEffect(() => {
     const checkBookmark = async () => {
@@ -125,7 +135,6 @@ export default function MangaDetailsPage() {
   };
 
   return (
-    
     <SafeAreaView className="mx-4 h-full mt-4">
       <View className="flex flex-col ">
         <View className=" flex flex-row items-end  ">
@@ -218,6 +227,7 @@ export default function MangaDetailsPage() {
             chNum={parseInt(item.chNum)}
             slug={manga!}
             chID={item.chId}
+            isRead={readChapters.includes(item.chId)}
           />
         )}
       />

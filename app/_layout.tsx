@@ -37,8 +37,11 @@ export default function RootLayout() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      
-        <GestureHandlerRootView>
+      <GestureHandlerRootView>
+        <HoldMenuProvider
+          theme={"dark"}
+          safeAreaInsets={{ top: 0, bottom: 0, left: 0, right: 0 }}
+        >
           <ThemeProvider
             value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
           >
@@ -70,8 +73,8 @@ export default function RootLayout() {
               />
             </Stack>
           </ThemeProvider>
-        </GestureHandlerRootView>
-   
+        </HoldMenuProvider>
+      </GestureHandlerRootView>
     </QueryClientProvider>
   );
 }

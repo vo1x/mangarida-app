@@ -12,23 +12,26 @@ export default function ReaderLayout() {
   };
 
   return (
-    <Stack >
+    <Stack>
       <Stack.Screen
         name="index"
         options={{
           headerShown: false,
           headerTitleAlign: "center",
-          headerStyle:{backgroundColor:'#1c1c1e'},
+          // animation: "fade",
           
           headerLeft: () => (
             <TouchableOpacity onPress={handleClose} className="">
-              <Ionicons name='exit' size={28} color={"#1288ff"} style={{
-                transform:[{rotate:'180deg'}]
-              }}></Ionicons>
+              <Ionicons
+                name="exit"
+                size={28}
+                color={"#1288ff"}
+                style={{
+                  transform: [{ rotate: "180deg" }],
+                }}
+              ></Ionicons>
             </TouchableOpacity>
           ),
-
-          
         }}
       />
     </Stack>

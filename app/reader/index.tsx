@@ -1,9 +1,8 @@
-import { Text, ScrollView, View } from "react-native";
-import { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { Text, ScrollView, View, StatusBar } from "react-native";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import useMangarida from "@/hooks/useMangarida";
 import Page from "@/components/Page";
-// import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import useReadChaptersStore from "@/stores/readChaptersStore";
 
@@ -20,7 +19,7 @@ const Reader = () => {
   const params = useLocalSearchParams<ReaderParams>();
   const chID = params.chID;
   const chNum = params.chNum;
-  const [isViewed, setIsViewed] = useState<boolean>(false);
+  const [isViewed, setIsViewed] = useState<boolean>(true);
   const navigation = useNavigation();
 
   const handleDoubleTap = () => {
@@ -46,19 +45,23 @@ const Reader = () => {
     navigation.setOptions({
       headerTitle: `Chapter ${chNum}`,
     });
-    // const markChapter = async () => await markChapterAsRead(chID!);
-    // markChapter();
+    const markChapter = async () => await markChapterAsRead(chID!);
+    markChapter();
   }, []);
 
   return (
     <GestureDetector gesture={doubleTap}>
-      <ScrollView>
-        <Text className="text-white">this is a read</Text>
-        <Text className="text-white">{chID}</Text>
-        <Text className="text-white">{chNum}</Text>
-        {pages.length > 0 &&
-          pages.map((page: any) => <Page key={page.pgNum} url={page.url} />)}
-      </ScrollView>
+      <View style={{ flex: 1 }}>
+        <StatusBar
+          animated={true}
+          showHideTransition={"fade"}
+          hidden={!isViewed}
+        />
+        <ScrollView style={{ flex: 1 }}>
+          {pages.length > 0 &&
+            pages.map((page: any) => <Page key={page.pgNum} url={page.url} />)}
+        </ScrollView>
+      </View>
     </GestureDetector>
   );
 };

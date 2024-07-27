@@ -17,12 +17,14 @@ const Chapter = ({
   chNum,
   slug,
   chID,
+  isRead,
 }: {
   title: string;
   publishedOn: string;
   chNum: number;
   slug: string;
   chID: string;
+  isRead: boolean;
 }) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -38,12 +40,12 @@ const Chapter = ({
     (state) => state.markChapterAsUnread
   );
 
-  const [isRead, setIsRead] = useState<boolean>(false);
+  // const [isRead, setIsRead] = useState<boolean>(false);
 
   useEffect(() => {
     const check = async () => {
       const read = await checkIfChapterIsRead(chID);
-      setIsRead(read);
+      // setIsRead(read);
     };
     check();
   }, []);
@@ -64,8 +66,8 @@ const Chapter = ({
   // }, [chID]);
 
   const handlePress = async () => {
-    await markChapterAsRead(chID);
-    setIsRead(true);
+    // await markChapterAsRead(chID);
+    // setIsRead(true);
     router.push({
       pathname: "/reader",
       params: {
@@ -91,10 +93,10 @@ const Chapter = ({
             if (buttonIndex === 2) {
             } else if (buttonIndex === 0) {
               await markChapterAsRead(chID);
-              setIsRead(() => true);
+              // setIsRead(() => true);
             } else if (buttonIndex === 1) {
               await markChapterAsUnread(chID);
-              setIsRead(() => false);
+              // setIsRead(() => false);
             }
           }
         );
