@@ -1,9 +1,11 @@
-import { Text, ScrollView } from "react-native";
+import { Text, ScrollView, View } from "react-native";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useNavigation } from "expo-router";
 import useMangarida from "@/hooks/useMangarida";
 import Page from "@/components/Page";
+// import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import useReadChaptersStore from "@/stores/readChaptersStore";
 
 interface ReaderParams extends Record<string, string> {
   chID: string;
@@ -36,10 +38,16 @@ const Reader = () => {
     });
   }, [isViewed]);
 
+  const markChapterAsRead = useReadChaptersStore(
+    (state) => state.markChapterAsRead
+  );
+
   useEffect(() => {
     navigation.setOptions({
       headerTitle: `Chapter ${chNum}`,
     });
+    // const markChapter = async () => await markChapterAsRead(chID!);
+    // markChapter();
   }, []);
 
   return (

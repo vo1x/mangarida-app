@@ -10,7 +10,7 @@ import {
 
 import { useEffect, useState } from "react";
 
-import { useLocalSearchParams } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 import { Bookmark } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
@@ -18,7 +18,7 @@ import { Ionicons } from "@expo/vector-icons";
 import Chapter from "@/components/Chapter";
 
 import useStore from "../../stores/libraryStore";
-
+import useReadChaptersStore from "@/stores/readChaptersStore";
 import useMangarida from "@/hooks/useMangarida";
 
 interface MangaDetails {
@@ -68,6 +68,7 @@ export default function MangaDetailsPage() {
   const isInLibrary = useStore((state) => state.checkMangaExistsInLibrary);
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
 
+
   const { useMetadata, useChapters } = useMangarida();
   const slug = manga!.split("|")[0].trim();
 
@@ -79,6 +80,7 @@ export default function MangaDetailsPage() {
   useEffect(() => {
     const checkBookmark = async () => {
       const isBookmarked = await isInLibrary(slug);
+      console.log(isBookmarked);
       setBookmarked(isBookmarked);
 
       if (isBookmarked) {
@@ -101,7 +103,7 @@ export default function MangaDetailsPage() {
       setMetadata({
         ...metadataData,
         chapters: chaptersData,
-        slug: manga,
+        slug: slug,
       });
     }
   }, [
@@ -123,6 +125,7 @@ export default function MangaDetailsPage() {
   };
 
   return (
+    
     <SafeAreaView className="mx-4 h-full mt-4">
       <View className="flex flex-col ">
         <View className=" flex flex-row items-end  ">
@@ -164,28 +167,22 @@ export default function MangaDetailsPage() {
           <Text className="text-neutral-400 text-base mb-4" numberOfLines={3}>
             {metaData?.synopsis}
           </Text>
-          {/* <ScrollView
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            className="flex flex-row gap-x-2 overflow-scroll"
-          >
-            {metaData?.genres.map((genre, i) => (
-              <View
-                key={genre}
-                className="p-1 px-2 bg-[#2c2c2e]  text-base w-max rounded-lg"
-              >
-                <Text className="text-gray-300">{genre}</Text>
-              </View>
-            ))}
-          </ScrollView> */}
           <Pressable
-            onPress={() => {}}
+            onPress={() =>
+              router.push({
+                pathname: `/reader`,
+                params: {
+                  chID: metaData?.chapters[metaData.chapters.length - 1].chId,
+                  chNum: metaData?.chapters[metaData.chapters.length - 1].chNum,
+                },
+              })
+            }
             style={{
               backgroundColor: `#1288ff`,
             }}
             className="p-2 rounded-xl my-2 mt-4"
           >
-            <Text className="text-white  text-center text-base ">
+            <Text className={`text-white  text-center text-base `}>
               {metaData && metaData.chapters.length > 0
                 ? `Start Reading Ch.${
                     metaData.chapters[metaData.chapters.length - 1].chNum

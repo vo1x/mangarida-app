@@ -52,9 +52,12 @@ export default function Library() {
           library.map((item: any, index) => (
             <MangaCard
               key={item.slug}
-              title={item.name}
-              imgUrl={item.posterUrl}
+              title={item.title}
+              mangaID={item.mangaID}
+              coverUrl={item.cover.url}
               slug={item.slug}
+              source={item.source}
+              contentRating={item.contentRating}
             />
           ))
         ) : (

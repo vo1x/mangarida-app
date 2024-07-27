@@ -2,6 +2,7 @@ import { StyleSheet } from "react-native";
 import { Tabs } from "expo-router";
 import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
+
 import { ComponentProps } from "react";
 
 interface TabItem {
