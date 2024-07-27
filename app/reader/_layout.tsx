@@ -1,8 +1,6 @@
 import { Stack } from "expo-router";
-import { TouchableOpacity, Text } from "react-native";
+import { TouchableOpacity } from "react-native";
 import { useRouter } from "expo-router";
-import { BlurView } from "expo-blur";
-import { StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 export default function ReaderLayout() {
   const router = useRouter();
@@ -18,8 +16,6 @@ export default function ReaderLayout() {
         options={{
           headerShown: false,
           headerTitleAlign: "center",
-          // animation: "fade",
-          
           headerLeft: () => (
             <TouchableOpacity onPress={handleClose} className="">
               <Ionicons

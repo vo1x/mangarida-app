@@ -3,7 +3,6 @@ import {
   Text,
   Image,
   Pressable,
-  ScrollView,
   SafeAreaView,
   FlatList,
 } from "react-native";
@@ -69,16 +68,22 @@ export default function MangaDetailsPage() {
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
 
   const { useMetadata, useChapters } = useMangarida();
+
   const slug = manga!.split("|")[0].trim();
   const loadReadChaptersLibrary = useReadChaptersStore(
     (state) => state.loadReadChapterLibrary
   );
   const readChapters = useReadChaptersStore((state) => state.readChapters);
+  const [apiEnabled, setApiEnabled] = useState<boolean>(false);
 
-  const { data: metadataData, isLoading: isMetadataLoading } =
-    useMetadata(slug);
-  const { data: chaptersData, isLoading: isChaptersLoading } =
-    useChapters(slug);
+  const { data: metadataData, isLoading: isMetadataLoading } = useMetadata(
+    slug,
+    apiEnabled
+  );
+  const { data: chaptersData, isLoading: isChaptersLoading } = useChapters(
+    slug,
+    apiEnabled
+  );
 
   useEffect(() => {
     const load = async () => {
@@ -96,7 +101,7 @@ export default function MangaDetailsPage() {
       if (isBookmarked) {
         const bookmarkedMetadata = await getMangaFromLibrary(slug);
         if (bookmarkedMetadata) setMetadata(bookmarkedMetadata);
-      }
+      } else setApiEnabled(true);
     };
 
     checkBookmark();
@@ -227,9 +232,11 @@ export default function MangaDetailsPage() {
             chNum={parseInt(item.chNum)}
             slug={manga!}
             chID={item.chId}
+            groupName={item.groupName}
             isRead={readChapters.includes(item.chId)}
           />
         )}
+        className="mb-2"
       />
     </SafeAreaView>
   );

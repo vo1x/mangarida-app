@@ -1,15 +1,9 @@
-import {
-  View,
-  Text,
-  Pressable,
-  ActionSheetIOS,
-  ActionSheetIOSOptions,
-} from "react-native";
-import { router, usePathname, useRouter } from "expo-router";
-import useReadChaptersStore from "@/stores/readChaptersStore";
-import { HoldItem } from "react-native-hold-menu";
-import { useEffect, useState } from "react";
+import { Text, View, Pressable, ActionSheetIOS } from "react-native";
+
+import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
+
+import useReadChaptersStore from "@/stores/readChaptersStore";
 
 const Chapter = ({
   title,
@@ -17,6 +11,7 @@ const Chapter = ({
   chNum,
   slug,
   chID,
+  groupName,
   isRead,
 }: {
   title: string;
@@ -24,15 +19,9 @@ const Chapter = ({
   chNum: number;
   slug: string;
   chID: string;
+  groupName: string;
   isRead: boolean;
 }) => {
-  const router = useRouter();
-  const pathname = usePathname();
-
-  const checkIfChapterIsRead = useReadChaptersStore(
-    (state) => state.checkIfChapterIsRead
-  );
-
   const markChapterAsRead = useReadChaptersStore(
     (state) => state.markChapterAsRead
   );
@@ -40,34 +29,7 @@ const Chapter = ({
     (state) => state.markChapterAsUnread
   );
 
-  // const [isRead, setIsRead] = useState<boolean>(false);
-
-  useEffect(() => {
-    const check = async () => {
-      const read = await checkIfChapterIsRead(chID);
-      // setIsRead(read);
-    };
-    check();
-  }, []);
-
-  // useEffect(() => {
-  //   const markAsRead = async () => {
-  //     await markChapterAsRead(chID);
-  //     setIsRead(true);
-  //   };
-  //   const markAsUnread = async () => {
-  //     await markChapterAsUnread(chID);
-  //     setIsRead(false);
-  //   };
-  //   return {
-  //     markAsRead,
-  //     markAsUnread,
-  //   };
-  // }, [chID]);
-
   const handlePress = async () => {
-    // await markChapterAsRead(chID);
-    // setIsRead(true);
     router.push({
       pathname: "/reader",
       params: {
@@ -86,17 +48,14 @@ const Chapter = ({
           {
             options: ["Mark as Read", "Mark as Unread", "Cancel"],
             cancelButtonIndex: 2,
-            // cancelButtonTintColor:['#FF3B30'],
             destructiveButtonIndex: 2,
           },
           async (buttonIndex) => {
             if (buttonIndex === 2) {
             } else if (buttonIndex === 0) {
               await markChapterAsRead(chID);
-              // setIsRead(() => true);
             } else if (buttonIndex === 1) {
               await markChapterAsUnread(chID);
-              // setIsRead(() => false);
             }
           }
         );
@@ -107,7 +66,11 @@ const Chapter = ({
       >
         {title}
       </Text>
-      <Text className="text-neutral-400">{publishedOn}</Text>
+      <View className="flex flex-row items-center gap-1">
+        <Text className="text-neutral-400">{publishedOn}</Text>
+        <Text className="text-neutral-400">•</Text>
+        <Text className="text-neutral-400 capitalize">{groupName}</Text>
+      </View>
     </Pressable>
   );
 };

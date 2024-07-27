@@ -1,14 +1,14 @@
 import { StyleSheet } from "react-native";
+import { ComponentProps } from "react";
+
 import { Tabs } from "expo-router";
 import { BlurView } from "expo-blur";
 import { Ionicons } from "@expo/vector-icons";
 
-import { ComponentProps } from "react";
-
 interface TabItem {
   name: string;
   label: string;
-  iconName: ComponentProps<typeof Ionicons>["name"]; 
+  iconName: ComponentProps<typeof Ionicons>["name"];
 }
 
 const TABS: TabItem[] = [

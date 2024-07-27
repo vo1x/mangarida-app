@@ -1,9 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Text, ScrollView, View, StatusBar } from "react-native";
-import { useLocalSearchParams, useNavigation } from "expo-router";
-import useMangarida from "@/hooks/useMangarida";
-import Page from "@/components/Page";
+import React, { useEffect, useState } from "react";
+import { ScrollView, View, StatusBar } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import { useLocalSearchParams, useNavigation } from "expo-router";
+
+import Page from "@/components/Page";
+
+import useMangarida from "@/hooks/useMangarida";
+
 import useReadChaptersStore from "@/stores/readChaptersStore";
 
 interface ReaderParams extends Record<string, string> {

@@ -40,7 +40,7 @@ const useMangarida = () => {
   };
 
   const getChapters = async (slug: string) => {
-    const url = `/chapters/${slug}?page=1`;
+    const url = `/chapters/${slug}`;
     const { data } = await axios.get<{ chapters: ChapterResult[] }>(url);
     return data.chapters;
   };
@@ -63,6 +63,7 @@ const useMangarida = () => {
 
   const useSearchResults = (
     searchValue: string,
+
     options?: Omit<
       UseQueryOptions<any, Error, any, string[]>,
       "queryKey" | "queryFn"
@@ -80,6 +81,8 @@ const useMangarida = () => {
 
   const useMetadata = (
     slug: string,
+    apiEnabled: boolean,
+
     options?: Omit<
       UseQueryOptions<any, Error, any, string[]>,
       "queryKey" | "queryFn"
@@ -91,11 +94,14 @@ const useMangarida = () => {
       staleTime: 5 * 60 * 1000,
       gcTime: 60 * 60 * 1000,
       notifyOnChangeProps,
+      enabled: apiEnabled,
       ...options,
     });
 
   const useChapters = (
     slug: string,
+    apiEnabled: boolean,
+
     options?: Omit<
       UseQueryOptions<any, Error, any, string[]>,
       "queryKey" | "queryFn"
@@ -106,6 +112,7 @@ const useMangarida = () => {
       queryFn: async () => await getChapters(slug),
       staleTime: 5 * 60 * 1000,
       gcTime: 60 * 60 * 1000,
+      enabled: apiEnabled,
       notifyOnChangeProps,
       ...options,
     });
