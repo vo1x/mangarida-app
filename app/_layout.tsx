@@ -13,7 +13,7 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import axios from "axios";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { HoldMenuProvider } from "react-native-hold-menu";
-axios.defaults.baseURL = "http://192.168.1.80:5000";
+axios.defaults.baseURL = "http://192.168.1.73:5000";
 const queryClient = new QueryClient();
 
 SplashScreen.preventAutoHideAsync();

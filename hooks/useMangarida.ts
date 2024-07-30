@@ -47,6 +47,7 @@ const useMangarida = () => {
 
   const useChapterPages = (
     chID: string,
+    apiEnabled: boolean,
     options?: Omit<
       UseQueryOptions<any, Error, any, string[]>,
       "queryKey" | "queryFn"
@@ -57,9 +58,10 @@ const useMangarida = () => {
       queryFn: () => getChapterPages(chID),
       staleTime: 5 * 60 * 1000,
       gcTime: 60 * 60 * 1000,
+      enabled: apiEnabled,
       notifyOnChangeProps,
       ...options,
-    });
+    });   
 
   const useSearchResults = (
     searchValue: string,

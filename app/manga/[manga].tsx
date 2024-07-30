@@ -204,7 +204,7 @@ export default function MangaDetailsPage() {
                 : "No chapters found"}
             </Text>
           </Pressable>
-        </View>
+          </View>
       </View>
 
       <FlatList
@@ -218,7 +218,7 @@ export default function MangaDetailsPage() {
           </Text>
         )}
         stickyHeaderIndices={[0]}
-        renderItem={({ item }) => (
+        renderItem={({ item, index }) => (
           <Chapter
             key={item.title}
             title={
@@ -234,6 +234,7 @@ export default function MangaDetailsPage() {
             chID={item.chId}
             groupName={item.groupName}
             isRead={readChapters.includes(item.chId)}
+            nextChId={metaData?.chapters[index + 1]?.chId}
           />
         )}
         className="mb-2"

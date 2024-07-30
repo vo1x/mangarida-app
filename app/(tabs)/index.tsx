@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, RefreshControl } from "react-native";
+import { View, Text, TextInput, RefreshControl, Button } from "react-native";
 
 import MangaCard from "@/components/MangaCard";
 import ThemedScrollView from "@/components/ThemedScrollView";
@@ -35,6 +35,12 @@ export default function Library() {
     fetchData();
   }, []);
 
+  const setLibrary = useStore((state) => state.setLibrary);
+
+  const handleLibReset = async () => {
+    await setLibrary([]);
+  };
+
   return (
     <ThemedScrollView
       refreshControl={
@@ -49,7 +55,9 @@ export default function Library() {
           className="bg-[#2c2c2e] rounded-lg text-[18px] text-white p-2 mt-2 w-full"
         ></TextInput>
       </View>
-
+      <View>
+        <Button title="Reset LIbrary" onPress={handleLibReset}></Button>
+      </View>
       <View className={`mt-4 flex flex-row flex-wrap justify-between mr-4`}>
         {library.length > 0 ? (
           library.map((item: any, index) => (

@@ -13,6 +13,7 @@ const Chapter = ({
   chID,
   groupName,
   isRead,
+  nextChId,
 }: {
   title: string;
   publishedOn: string;
@@ -21,6 +22,7 @@ const Chapter = ({
   chID: string;
   groupName: string;
   isRead: boolean;
+  nextChId: string | undefined;
 }) => {
   const markChapterAsRead = useReadChaptersStore(
     (state) => state.markChapterAsRead
@@ -35,6 +37,8 @@ const Chapter = ({
       params: {
         chID: chID,
         chNum: chNum,
+        slug: slug.split("|")[0],
+        nextChId: nextChId,
       },
     });
   };
