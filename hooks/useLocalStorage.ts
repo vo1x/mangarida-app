@@ -1,68 +1,84 @@
 import * as FileSystem from "expo-file-system";
-import * as MediaLibrary from "expo-media-library";
 
 const useLocalStorage = () => {
-  const downloadAndStoreChapter = async (imageUrl: string) => {
+  const downloadAndStoreChapter = async (
+    imageUrls: string[],
+    mangaSlug: string,
+    chapterID: string
+  ) => {
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status !== "granted") {
-        alert("Media Library permissions are required to download chapters");
-        return;
-      }
-      const cacheDirectory = FileSystem.cacheDirectory;
-      const fileName = imageUrl.split("/").pop();
-      const fileUri = cacheDirectory! + fileName;
+      const documentsFolderUri = `${FileSystem.documentDirectory}mangarida/${mangaSlug}/${chapterID}/`;
 
-      const downloadResult = await FileSystem.downloadAsync(
-        imageUrl,
-        FileSystem.cacheDirectory! + imageUrl.split("/").pop()
-      );
-
-      if (downloadResult.status === 200) {
-        const documentsFolderUri = FileSystem.documentDirectory + "mangarida/";
-        const finalUri = documentsFolderUri + fileName;
-
-        const info = await FileSystem.getInfoAsync(documentsFolderUri);
-        if (!info.exists) {
-          await FileSystem.makeDirectoryAsync(documentsFolderUri, {
-            intermediates: true,
-          });
-        }
-
-        await FileSystem.moveAsync({
-          from: fileUri,
-          to: finalUri,
+      const info = await FileSystem.getInfoAsync(documentsFolderUri);
+      if (!info.exists) {
+        await FileSystem.makeDirectoryAsync(documentsFolderUri, {
+          intermediates: true,
         });
-
-        console.log("Image saved to Documents folder:", finalUri);
-      } else {
-        console.error("Failed to download image:", downloadResult);
       }
+
+      for (let index = 0; index < imageUrls.length; index++) {
+        const imageUrl = imageUrls[index];
+        const fileExtension = imageUrl.split(".").pop();
+        const newFileName = `${index + 1}.${fileExtension}`;
+        const fileUri = `${FileSystem.cacheDirectory}${newFileName}`;
+
+        const downloadResult = await FileSystem.downloadAsync(
+          imageUrl,
+          fileUri
+        );
+
+        if (downloadResult.status === 200) {
+          const finalUri = documentsFolderUri + newFileName;
+
+          await FileSystem.moveAsync({
+            from: fileUri,
+            to: finalUri,
+          });
+
+          console.log("Image saved to:", finalUri);
+        } else {
+          console.error("Failed to download image:", downloadResult);
+        }
+      }
+      return true;
     } catch (error) {
-      console.error("Error download image: ", error);
+      console.error("Error downloading images: ", error);
     }
   };
 
-  const accessSavedFile = async (imageUrl: string) => {
+  const accessDownloadedChapter = async (
+    mangaSlug: string,
+    chapterID: string
+  ) => {
     try {
-      const fileName = imageUrl.split("/").pop();
-      const filePath = FileSystem.documentDirectory + "mangarida/" + fileName;
+      const directoryUri = `${FileSystem.documentDirectory}mangarida/${mangaSlug}/${chapterID}`;
 
-      const fileInfo = await FileSystem.getInfoAsync(filePath);
-      if (fileInfo.exists) {
-        console.log("File exists at:", filePath);
-        return filePath;
-      } else {
-        console.error("File does not exist.");
-        return null;
+      const directoryInfo = await FileSystem.getInfoAsync(directoryUri);
+      if (!directoryInfo.exists) {
+        console.error("Directory does not exist:", directoryUri);
+        return [];
       }
+
+      const files = await FileSystem.readDirectoryAsync(directoryUri);
+
+      const sortedFilePaths = files
+        .map((fileName) => ({
+          fileName,
+          filePath: `${directoryUri}${fileName}`,
+          fileNumber: parseInt(fileName.split(".")[0], 10),
+        }))
+        .sort((a, b) => a.fileNumber - b.fileNumber)
+        .map((file) => file.filePath);
+
+      console.log("Sorted files in directory:", sortedFilePaths);
+      return sortedFilePaths;
     } catch (error) {
-      console.error("Error accessing saved file:", error);
-      return null;
+      console.error("Error accessing saved files:", error);
+      return [];
     }
   };
 
-  return { downloadAndStoreChapter, accessSavedFile };
+  return { downloadAndStoreChapter, accessDownloadedChapter };
 };
 
 export default useLocalStorage;
