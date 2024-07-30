@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import {
   View,
   Text,
@@ -6,19 +7,14 @@ import {
   SafeAreaView,
   FlatList,
 } from "react-native";
-
-import { useEffect, useState } from "react";
-
 import { router, useLocalSearchParams } from "expo-router";
-
 import { Bookmark } from "lucide-react-native";
 import { Ionicons } from "@expo/vector-icons";
-
-import Chapter from "@/components/Chapter";
-
+import Chapter from "@/components/MangaDetails/Chapter";
 import useStore from "../../stores/libraryStore";
 import useReadChaptersStore from "@/stores/readChaptersStore";
 import useMangarida from "@/hooks/useMangarida";
+import FilterModal from "@/components/MangaDetails/FilterModal";
 
 interface MangaDetails {
   title: string;
@@ -36,6 +32,7 @@ interface MangaDetails {
   genres: string[];
   mangazines: string[];
   chapters: ChapterResult[];
+  groups: string[];
   slug: string;
   isBookmarked: boolean;
 }
@@ -51,30 +48,27 @@ interface ChapterResult {
   groupName: string;
 }
 
-interface SearchParams extends Record<string, string> {
-  mangaTitle: string;
-}
-
 export default function MangaDetailsPage() {
   const { manga } = useLocalSearchParams<{ manga: string }>();
-  const params = useLocalSearchParams<SearchParams>();
-  const { mangaTitle } = params;
+  const { mangaTitle } = useLocalSearchParams<{ mangaTitle: string }>();
 
-  const [metaData, setMetadata] = useState<MangaDetails>();
+  const [metaData, setMetadata] = useState<MangaDetails | null>(null);
   const [bookmarked, setBookmarked] = useState<boolean>(false);
+  const [apiEnabled, setApiEnabled] = useState<boolean>(false);
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
   const bookmarkManga = useStore((state) => state.bookmarkManga);
   const isInLibrary = useStore((state) => state.checkMangaExistsInLibrary);
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
-
-  const { useMetadata, useChapters } = useMangarida();
-
-  const slug = manga!.split("|")[0].trim();
   const loadReadChaptersLibrary = useReadChaptersStore(
     (state) => state.loadReadChapterLibrary
   );
   const readChapters = useReadChaptersStore((state) => state.readChapters);
-  const [apiEnabled, setApiEnabled] = useState<boolean>(false);
+
+  const { useMetadata, useChapters } = useMangarida();
+
+  const slug = manga ? manga.split("|")[0].trim() : "";
 
   const { data: metadataData, isLoading: isMetadataLoading } = useMetadata(
     slug,
@@ -86,26 +80,24 @@ export default function MangaDetailsPage() {
   );
 
   useEffect(() => {
-    const load = async () => {
-      await loadReadChaptersLibrary();
-    };
-    load();
+    loadReadChaptersLibrary();
   }, []);
 
   useEffect(() => {
-    const checkBookmark = async () => {
+    async function checkBookmark() {
       const isBookmarked = await isInLibrary(slug);
-      console.log(isBookmarked);
       setBookmarked(isBookmarked);
 
       if (isBookmarked) {
         const bookmarkedMetadata = await getMangaFromLibrary(slug);
         if (bookmarkedMetadata) setMetadata(bookmarkedMetadata);
-      } else setApiEnabled(true);
-    };
+      } else {
+        setApiEnabled(true);
+      }
+    }
 
     checkBookmark();
-  }, [manga]);
+  }, [slug]);
 
   useEffect(() => {
     if (
@@ -117,7 +109,8 @@ export default function MangaDetailsPage() {
     ) {
       setMetadata({
         ...metadataData,
-        chapters: chaptersData,
+        chapters: chaptersData?.chapters,
+        groups: chaptersData?.groups || [],
         slug: slug,
       });
     }
@@ -127,118 +120,142 @@ export default function MangaDetailsPage() {
     isChaptersLoading,
     metadataData,
     chaptersData,
-    manga,
+    slug,
   ]);
+
+  const handleBookmark = async () => {
+    if (metaData) {
+      await bookmarkManga(metaData);
+      setBookmarked(!bookmarked);
+    }
+  };
 
   if (isMetadataLoading || isChaptersLoading) {
     return <Text>Loading...</Text>;
   }
 
-  const handleBookmark = async (metaData: MangaDetails) => {
-    await bookmarkManga(metaData);
-    setBookmarked(!bookmarked);
-  };
+  const filteredChapters = metaData?.chapters.filter(
+    (chapter) => !selectedGroups.includes(chapter.groupName)
+  );
 
   return (
-    <SafeAreaView className="mx-4 h-full mt-4">
-      <View className="flex flex-col ">
-        <View className=" flex flex-row items-end  ">
-          <Image
-            source={{ uri: metaData?.cover.url }}
-            className="w-28 h-44 rounded-lg object-contain"
-          />
-          <View className="ml-2 flex-1">
-            <Text className="text-white text-xl font-semibold ">
-              {mangaTitle ?? metaData?.title}
-            </Text>
-            <Text className="text-gray-400">
-              {metaData?.authors.join(", ")}
-            </Text>
-            {metaData && metaData.chapters.length > 0 ? (
-              <View className="flex flex-row items-center gap-2 mt-1">
-                <Pressable
-                  className="bg-[#1c1c1e] p-2 rounded-lg"
-                  onPress={() => handleBookmark(metaData)}
+    <View>
+      <FilterModal
+        initialSelectedGroups={selectedGroups}
+        isVisible={modalVisible}
+        onClose={() => setModalVisible(false)}
+        groupNames={metaData?.groups || []}
+        onSelectionChange={(groups) => {
+          setSelectedGroups(groups);
+          setModalVisible(false);
+        }}
+      />
+      <SafeAreaView className="mx-4 h-full mt-4">
+        {metaData && (
+          <>
+            <View className="flex flex-col">
+              <View className="flex flex-row items-end">
+                <Image
+                  source={{ uri: metaData.cover.url }}
+                  className="w-28 h-44 rounded-lg object-contain"
+                />
+                <View className="ml-2 flex-1">
+                  <Text className="text-white text-xl font-semibold">
+                    {mangaTitle ?? metaData.title}
+                  </Text>
+                  <Text className="text-gray-400">
+                    {metaData.authors.join(", ")}
+                  </Text>
+                  {filteredChapters && filteredChapters?.length > 0 && (
+                    <View className="flex flex-row items-center gap-2 mt-1">
+                      <Pressable
+                        className="bg-[#1c1c1e] p-2 rounded-lg"
+                        onPress={handleBookmark}
+                      >
+                        <Bookmark
+                          color={"#1288ff"}
+                          fill={bookmarked ? "#1288ff" : "none"}
+                          size={24}
+                        />
+                      </Pressable>
+                      <Pressable className="bg-[#1c1c1e] p-2 rounded-lg">
+                        <Ionicons name="download" size={24} color={"#1288ff"} />
+                      </Pressable>
+                    </View>
+                  )}
+                </View>
+              </View>
+              <View className="mt-2">
+                <Text
+                  className="text-neutral-400 text-base mb-4"
+                  numberOfLines={3}
                 >
-                  <Bookmark
-                    color={"#1288ff"}
-                    fill={bookmarked ? "#1288ff" : "none"}
-                    size={24}
-                  />
-                </Pressable>
-                <Pressable className="bg-[#1c1c1e] p-2 rounded-lg">
-                  <Ionicons
-                    name="download"
-                    size={24}
-                    color={"#1288ff"}
-                  ></Ionicons>
+                  {metaData.synopsis}
+                </Text>
+                <Pressable
+                  onPress={() =>
+                    router.push({
+                      pathname: `/reader`,
+                      params: {
+                        chID: filteredChapters?.[filteredChapters.length - 1]
+                          .chId,
+                        chNum:
+                          filteredChapters?.[filteredChapters.length - 1].chNum,
+                      },
+                    })
+                  }
+                  style={{
+                    backgroundColor: `#1288ff`,
+                  }}
+                  className="p-2 rounded-xl my-2 mt-4"
+                >
+                  <Text className={`text-white text-center text-base`}>
+                    {filteredChapters && filteredChapters?.length > 0
+                      ? `Start Reading Ch.${
+                          filteredChapters[filteredChapters.length - 1].chNum
+                        }`
+                      : "No chapters found"}
+                  </Text>
                 </Pressable>
               </View>
-            ) : null}
-          </View>
-        </View>
-        <View className="mt-2">
-          <Text className="text-neutral-400 text-base mb-4" numberOfLines={3}>
-            {metaData?.synopsis}
-          </Text>
-          <Pressable
-            onPress={() =>
-              router.push({
-                pathname: `/reader`,
-                params: {
-                  chID: metaData?.chapters[metaData.chapters.length - 1].chId,
-                  chNum: metaData?.chapters[metaData.chapters.length - 1].chNum,
-                },
-              })
-            }
-            style={{
-              backgroundColor: `#1288ff`,
-            }}
-            className="p-2 rounded-xl my-2 mt-4"
-          >
-            <Text className={`text-white  text-center text-base `}>
-              {metaData && metaData.chapters.length > 0
-                ? `Start Reading Ch.${
-                    metaData.chapters[metaData.chapters.length - 1].chNum
-                  }`
-                : "No chapters found"}
-            </Text>
-          </Pressable>
-          </View>
-      </View>
-
-      <FlatList
-        data={metaData?.chapters}
-        ItemSeparatorComponent={() => (
-          <View className="border border-[#2c2c2e] my-2 border-0.5" />
+            </View>
+            <View className="flex flex-row justify-between items-center bg-black">
+              <Text className="text-white text-xl font-semibold py-2 bg-black">
+                {filteredChapters?.length} Chapters
+              </Text>
+              <Pressable onPress={() => setModalVisible(true)}>
+                <Ionicons name="filter" color="#1288ff" size={24} />
+              </Pressable>
+            </View>
+            <FlatList
+              data={filteredChapters}
+              ItemSeparatorComponent={() => (
+                <View className="border border-[#2c2c2e] my-2 border-0.5" />
+              )}
+              renderItem={({ item, index }) => (
+                <Chapter
+                  key={item.title}
+                  title={
+                    item.title === null
+                      ? item.chNum === null
+                        ? "Chapter"
+                        : `Chapter ${item.chNum}`
+                      : `Chapter ${item.chNum ?? ""}: ${item.title}`
+                  }
+                  publishedOn={item.createdAt}
+                  chNum={parseInt(item.chNum)}
+                  slug={manga!}
+                  chID={item.chId}
+                  groupName={item.groupName}
+                  isRead={readChapters.includes(item.chId)}
+                  nextChId={filteredChapters?.[index + 1]?.chId}
+                />
+              )}
+              className="mb-2"
+            />
+          </>
         )}
-        ListHeaderComponent={() => (
-          <Text className="text-white text-xl font-semibold py-2 bg-black">
-            {metaData?.chapters.length ?? 0} Chapters
-          </Text>
-        )}
-        stickyHeaderIndices={[0]}
-        renderItem={({ item, index }) => (
-          <Chapter
-            key={item.title}
-            title={
-              item.title === null
-                ? item.chNum === null
-                  ? "Chapter"
-                  : `Chapter ${item.chNum}`
-                : `Chapter ${item.chNum ?? ""}: ${item.title}`
-            }
-            publishedOn={item.createdAt}
-            chNum={parseInt(item.chNum)}
-            slug={manga!}
-            chID={item.chId}
-            groupName={item.groupName}
-            isRead={readChapters.includes(item.chId)}
-            nextChId={metaData?.chapters[index + 1]?.chId}
-          />
-        )}
-        className="mb-2"
-      />
-    </SafeAreaView>
+      </SafeAreaView>
+    </View>
   );
 }

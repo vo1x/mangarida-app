@@ -17,9 +17,11 @@ interface MangaDetails {
   genres: string[];
   mangazines: string[];
   chapters: ChapterResult[];
+  groups: string[]; // Added groups property
   slug: string;
   isBookmarked: boolean;
 }
+
 
 interface ChapterResult {
   chId: string;

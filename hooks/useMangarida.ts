@@ -4,17 +4,6 @@ import { UseQueryOptions } from "@tanstack/react-query";
 
 import { useFocusNotifyOnChangeProps } from "./useFocusNotifyOnChangeProps";
 
-interface ChapterResult {
-  chId: string;
-  chNum: string;
-  title: string;
-  volume: string;
-  language: string;
-  createdAt: string;
-  isLastCh: string;
-  groupName: string;
-}
-
 const useMangarida = () => {
   const notifyOnChangeProps = useFocusNotifyOnChangeProps();
   const getChapterPages = async (chID: string) => {
@@ -41,8 +30,8 @@ const useMangarida = () => {
 
   const getChapters = async (slug: string) => {
     const url = `/chapters/${slug}`;
-    const { data } = await axios.get<{ chapters: ChapterResult[] }>(url);
-    return data.chapters;
+    const { data } = await axios.get(url);
+    return data;
   };
 
   const useChapterPages = (
@@ -61,7 +50,7 @@ const useMangarida = () => {
       enabled: apiEnabled,
       notifyOnChangeProps,
       ...options,
-    });   
+    });
 
   const useSearchResults = (
     searchValue: string,

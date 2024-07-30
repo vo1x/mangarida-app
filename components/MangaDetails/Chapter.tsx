@@ -1,8 +1,6 @@
 import { Text, View, Pressable, ActionSheetIOS } from "react-native";
-
 import { router } from "expo-router";
 import * as Haptics from "expo-haptics";
-
 import useReadChaptersStore from "@/stores/readChaptersStore";
 
 const Chapter = ({

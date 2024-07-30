@@ -15,13 +15,13 @@ const { width } = Dimensions.get("window");
 const PageSlider = ({
   visible,
   currentPageIndex,
-  currentChapterPages,
+  chapterPages,
   onSliderValueChange,
   onSlidingComplete,
 }: {
   visible: boolean;
   currentPageIndex: number;
-  currentChapterPages: Page[];
+  chapterPages: Page[];
   onSliderValueChange: any;
   onSlidingComplete: any;
 }) => {
@@ -45,7 +45,7 @@ const PageSlider = ({
             style={{ width: width * 0.9 }}
             minimumValue={0}
             maximumValue={1}
-            value={currentPageIndex / (currentChapterPages.length - 1)}
+            value={currentPageIndex / (chapterPages.length - 1)}
             onValueChange={onSliderValueChange}
             onSlidingComplete={onSlidingComplete}
             minimumTrackTintColor="#1288ff"
@@ -55,7 +55,7 @@ const PageSlider = ({
             accessibilityHint="Slide to change pages"
           />
           <Text className="text-white text-base ">
-            Page {currentPageIndex + 1} of {currentChapterPages.length}
+            Page {currentPageIndex + 1} of {chapterPages.length}
           </Text>
         </View>
       </BlurView>

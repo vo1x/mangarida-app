@@ -1,10 +1,6 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-interface ChapterResult {
-  chId: string;
-}
-
 interface StoreState {
   readChapters: string[];
   setReadChapterLibrary: (newReadChapters: string[]) => Promise<void>;
