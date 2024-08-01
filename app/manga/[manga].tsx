@@ -15,6 +15,7 @@ import useStore from "../../stores/libraryStore";
 import useReadChaptersStore from "@/stores/readChaptersStore";
 import useMangarida from "@/hooks/useMangarida";
 import FilterModal from "@/components/MangaDetails/FilterModal";
+import useChapterStore from "@/stores/chapterStore";
 
 interface MangaDetails {
   title: string;
@@ -58,6 +59,8 @@ export default function MangaDetailsPage() {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [selectedGroups, setSelectedGroups] = useState<string[]>([]);
 
+  const { setChapterLibrary } = useChapterStore();
+
   const bookmarkManga = useStore((state) => state.bookmarkManga);
   const isInLibrary = useStore((state) => state.checkMangaExistsInLibrary);
   const getMangaFromLibrary = useStore((state) => state.getMangaFromLibrary);
@@ -81,7 +84,7 @@ export default function MangaDetailsPage() {
 
   useEffect(() => {
     loadReadChaptersLibrary();
-  }, []);
+  }, [loadReadChaptersLibrary]);
 
   useEffect(() => {
     async function checkBookmark() {
@@ -90,14 +93,17 @@ export default function MangaDetailsPage() {
 
       if (isBookmarked) {
         const bookmarkedMetadata = await getMangaFromLibrary(slug);
-        if (bookmarkedMetadata) setMetadata(bookmarkedMetadata);
+        if (bookmarkedMetadata) {
+          setMetadata(bookmarkedMetadata);
+          setChapterLibrary(bookmarkedMetadata.chapters);
+        }
       } else {
         setApiEnabled(true);
       }
     }
 
     checkBookmark();
-  }, [slug]);
+  }, [slug, isInLibrary, getMangaFromLibrary, setChapterLibrary]);
 
   useEffect(() => {
     if (
@@ -107,12 +113,14 @@ export default function MangaDetailsPage() {
       metadataData &&
       chaptersData
     ) {
-      setMetadata({
+      const combinedMetadata = {
         ...metadataData,
         chapters: chaptersData?.chapters,
         groups: chaptersData?.groups || [],
         slug: slug,
-      });
+      };
+      setMetadata(combinedMetadata);
+      setChapterLibrary(combinedMetadata.chapters);
     }
   }, [
     bookmarked,
@@ -121,12 +129,13 @@ export default function MangaDetailsPage() {
     metadataData,
     chaptersData,
     slug,
+    setChapterLibrary,
   ]);
 
   const handleBookmark = async () => {
     if (metaData) {
       await bookmarkManga(metaData);
-      setBookmarked(!bookmarked);
+      setBookmarked((prev) => !prev);
     }
   };
 
@@ -243,7 +252,7 @@ export default function MangaDetailsPage() {
                       : `Chapter ${item.chNum ?? ""}: ${item.title}`
                   }
                   publishedOn={item.createdAt}
-                  chNum={parseInt(item.chNum)}
+                  chNum={item.chNum}
                   slug={manga!}
                   chID={item.chId}
                   groupName={item.groupName}
