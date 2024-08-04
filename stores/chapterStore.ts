@@ -13,20 +13,21 @@ const useChapterStore = create<ChapterStoreState>((set, get) => ({
       (chapter) => chapter.chNum === currentChNum
     );
 
-    if (currentIndex === -1 || currentIndex === chapters.length - 1) {
+    if (currentIndex === -1 || currentIndex === 0) {
       return null;
     }
 
     let nextIndex = currentIndex - 1;
-    while (
-      nextIndex < chapters.length &&
-      chapters[nextIndex].chNum === currentChNum
-    ) {
-      nextIndex++;
+    while (nextIndex >= 0 && chapters[nextIndex].chNum === currentChNum) {
+      nextIndex--;
     }
 
-    if (nextIndex < chapters.length) {
-      return chapters[nextIndex];
+    if (nextIndex >= 0) {
+     
+      return {
+        chId: chapters[nextIndex].chId,
+        chNum: chapters[nextIndex].chNum,
+      };
     }
 
     return null;

@@ -221,7 +221,7 @@ export default function MangaDetailsPage() {
                       : `Chapter ${item.chNum ?? ""}: ${item.title}`
                   }
                   publishedOn={item.createdAt}
-                  chNum={item.chNum.toString()}
+                  chNum={item.chNum}
                   slug={manga!}
                   chID={item.chId}
                   groupName={item.groupName}

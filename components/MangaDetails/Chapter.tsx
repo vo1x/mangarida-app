@@ -15,7 +15,7 @@ const Chapter = ({
 }: {
   title: string;
   publishedOn: string;
-  chNum: string;
+  chNum: number;
   slug: string;
   chID: string;
   groupName: string;
