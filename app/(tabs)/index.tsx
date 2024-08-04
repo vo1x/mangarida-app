@@ -1,17 +1,23 @@
 import { useEffect, useState } from "react";
-import { View, Text, TextInput, RefreshControl, Button } from "react-native";
+import {
+  View,
+  Text,
+  TextInput,
+  RefreshControl,
+  Button,
+  SafeAreaView,
+  ScrollView,
+} from "react-native";
 
 import MangaCard from "@/components/MangaCard";
-import ThemedScrollView from "@/components/ThemedScrollView";
-
 import useStore from "@/stores/libraryStore";
 
 export default function Library() {
   const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const loadLibrary = useStore((state) => state.loadLibrary);
-
   const library = useStore((state) => state.library);
+  const setLibrary = useStore((state) => state.setLibrary);
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -33,48 +39,48 @@ export default function Library() {
       }
     };
     fetchData();
-  }, []);
-
-  const setLibrary = useStore((state) => state.setLibrary);
+  }, [loadLibrary]);
 
   const handleLibReset = async () => {
     await setLibrary([]);
   };
 
   return (
-    <ThemedScrollView
-      refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-      }
-    >
-      <View>
-        <Text className="text-white text-3xl font-semibold">Library</Text>
-        <TextInput
-          placeholder="Find something"
-          placeholderTextColor="#9ca3af"
-          className="bg-[#2c2c2e] rounded-lg text-[18px] text-white p-2 mt-2 w-full"
-        ></TextInput>
-      </View>
-      <View>
-        <Button title="Reset LIbrary" onPress={handleLibReset}></Button>
-      </View>
-      <View className={`mt-4 flex flex-row flex-wrap justify-between mr-4`}>
-        {library.length > 0 ? (
-          library.map((item: any, index) => (
-            <MangaCard
-              key={item.slug}
-              title={item.title}
-              mangaID={item.mangaID}
-              coverUrl={item.cover.url}
-              slug={item.slug}
-              source={item.source}
-              contentRating={item.contentRating}
-            />
-          ))
-        ) : (
-          <Text className="text-white text-2xl">Nothing in library</Text>
-        )}
-      </View>
-    </ThemedScrollView>
+    <SafeAreaView>
+      <ScrollView
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View>
+          <Text className="text-white text-3xl font-semibold">Library</Text>
+          <TextInput
+            placeholder="Find something"
+            placeholderTextColor="#9ca3af"
+            className="bg-[#2c2c2e] rounded-lg text-[18px] text-white p-2 mt-2 w-full"
+          />
+        </View>
+        <View>
+          <Button title="Reset Library" onPress={handleLibReset} />
+        </View>
+        <View className="mt-4 flex flex-row flex-wrap justify-between mr-4">
+          {library.length > 0 ? (
+            library.map((item: any) => (
+              <MangaCard
+                key={item.slug}
+                title={item.title}
+                mangaID={item.mangaID}
+                coverUrl={item.cover.url}
+                slug={item.slug}
+                source={item.source}
+                contentRating={item.contentRating}
+              />
+            ))
+          ) : (
+            <Text className="text-white text-2xl">Nothing in library</Text>
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }

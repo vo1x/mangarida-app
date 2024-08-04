@@ -38,7 +38,7 @@ export default function TabsLayout() {
     >
       {TABS.map((tab, index) => (
         <Tabs.Screen
-          key={"tab-" + index}
+          key={`tab-${index}`}
           name={tab.name}
           options={{
             tabBarLabel: tab.label,

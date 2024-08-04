@@ -1,16 +1,8 @@
 import { create } from "zustand";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ReadChaptersStoreState } from "@/interfaces/interfaces";
 
-interface StoreState {
-  readChapters: string[];
-  setReadChapterLibrary: (newReadChapters: string[]) => Promise<void>;
-  loadReadChapterLibrary: () => Promise<void>;
-  markChapterAsRead: (chIdToMark: string) => Promise<void>;
-  markChapterAsUnread: (chIdToMark: string) => Promise<void>;
-  checkIfChapterIsRead: (chId: string) => Promise<boolean>;
-}
-
-const useReadChaptersStore = create<StoreState>((set) => ({
+const useReadChaptersStore = create<ReadChaptersStoreState>((set) => ({
   readChapters: [],
   setReadChapterLibrary: async (newReadChapters) => {
     set({ readChapters: newReadChapters });

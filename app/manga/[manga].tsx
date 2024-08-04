@@ -16,38 +16,7 @@ import useReadChaptersStore from "@/stores/readChaptersStore";
 import useMangarida from "@/hooks/useMangarida";
 import FilterModal from "@/components/MangaDetails/FilterModal";
 import useChapterStore from "@/stores/chapterStore";
-
-interface MangaDetails {
-  title: string;
-  altNames: string[];
-  status: string;
-  type: string;
-  synopsis: string;
-  cover: {
-    height: number;
-    width: number;
-    url: string;
-  };
-  authors: string[];
-  publishedOn: string;
-  genres: string[];
-  mangazines: string[];
-  chapters: ChapterResult[];
-  groups: string[];
-  slug: string;
-  isBookmarked: boolean;
-}
-
-interface ChapterResult {
-  chId: string;
-  chNum: string;
-  title: string;
-  volume: string;
-  language: string;
-  createdAt: string;
-  isLastCh: string;
-  groupName: string;
-}
+import { MangaDetails } from "@/interfaces/interfaces";
 
 export default function MangaDetailsPage() {
   const { manga } = useLocalSearchParams<{ manga: string }>();
@@ -252,7 +221,7 @@ export default function MangaDetailsPage() {
                       : `Chapter ${item.chNum ?? ""}: ${item.title}`
                   }
                   publishedOn={item.createdAt}
-                  chNum={item.chNum}
+                  chNum={item.chNum.toString()}
                   slug={manga!}
                   chID={item.chId}
                   groupName={item.groupName}

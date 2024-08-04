@@ -1,31 +1,20 @@
-import React from "react";
-import { useRef, useEffect } from "react";
+import React, { useRef, useEffect } from "react";
 import { View, Text, Dimensions, Animated } from "react-native";
-import Slider from "@react-native-community/slider";
-
 import { BlurView } from "expo-blur";
-interface Page {
-  pgNum: string | number;
-  url: string;
-  chapterNum: number;
-}
 
 const { width } = Dimensions.get("window");
 
 const PageSlider = ({
   visible,
   currentPageIndex,
-  chapterPages,
-  onSliderValueChange,
-  onSlidingComplete,
+  chapterLength,
 }: {
   visible: boolean;
   currentPageIndex: number;
-  chapterPages: Page[];
-  onSliderValueChange: any;
-  onSlidingComplete: any;
+  chapterLength: number;
 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
+
   useEffect(() => {
     Animated.timing(opacity, {
       toValue: visible ? 1 : 0,
@@ -37,29 +26,34 @@ const PageSlider = ({
   return (
     <Animated.View
       style={[{ opacity }]}
-      className="absolute bottom-0 left-0 right-0 "
+      className="absolute bottom-0 left-0 right-0"
     >
       <BlurView intensity={80} tint="dark" className="py-10 pt-4">
         <View className="items-center justify-center w-full">
-          <Slider
-            style={{ width: width * 0.9 }}
-            minimumValue={0}
-            maximumValue={1}
-            value={currentPageIndex / (chapterPages.length - 1)}
-            onValueChange={onSliderValueChange}
-            onSlidingComplete={onSlidingComplete}
-            minimumTrackTintColor="#1288ff"
-            maximumTrackTintColor="#888"
-            thumbTintColor="#ffffff"
-            accessibilityLabel="Page slider"
-            accessibilityHint="Slide to change pages"
-          />
-          <Text className="text-white text-base ">
-            Page {currentPageIndex + 1} of {chapterPages.length}
+          <View
+            style={{
+              width: width * 0.9,
+              height: 10,
+              borderRadius: 5,
+              backgroundColor: "#888",
+            }}
+          >
+            <View
+              style={{
+                width: `${(currentPageIndex / (chapterLength - 1)) * 100}%`,
+                height: '100%',
+                borderRadius: 5,
+                backgroundColor: "#1288ff",
+              }}
+            />
+          </View>
+          <Text className="text-white text-base mt-2">
+            Page {currentPageIndex + 1} of {chapterLength}
           </Text>
         </View>
       </BlurView>
     </Animated.View>
   );
 };
+
 export default PageSlider;

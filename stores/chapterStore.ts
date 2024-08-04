@@ -1,48 +1,35 @@
 import { create } from "zustand";
+import { ChapterStoreState } from "@/interfaces/interfaces";
 
-interface Chapter {
-  chId: string;
-  chNum: string;
-}
-
-interface StoreState {
-  chapters: Chapter[];
-  setChapterLibrary: (newChapters: Chapter[]) => Promise<void>;
-  getNextUniqueChapterId: (currentChNum: string) => Chapter | undefined;
-}
-
-const useChapterStore = create<StoreState>((set, get) => ({
+const useChapterStore = create<ChapterStoreState>((set, get) => ({
   chapters: [],
-  setChapterLibrary: async (newChapters) => {
+  setChapterLibrary: (newChapters) => {
     set({ chapters: newChapters });
   },
 
-  getNextUniqueChapterId: (currentChNum) => {
+  getNextChapter: async (currentChNum: number) => {
     const { chapters } = get();
     const currentIndex = chapters.findIndex(
       (chapter) => chapter.chNum === currentChNum
     );
 
-    if (currentIndex === -1 || currentIndex >= chapters.length - 1) {
-      return undefined;
+    if (currentIndex === -1 || currentIndex === chapters.length - 1) {
+      return null;
     }
 
     let nextIndex = currentIndex - 1;
-    let nextChapter = chapters[nextIndex];
-
-    while (nextIndex < chapters.length && nextChapter.chNum === currentChNum) {
+    while (
+      nextIndex < chapters.length &&
+      chapters[nextIndex].chNum === currentChNum
+    ) {
       nextIndex++;
-      nextChapter = chapters[nextIndex];
     }
 
     if (nextIndex < chapters.length) {
-      return {
-        chId: nextChapter.chId,
-        chNum: nextChapter.chNum,
-      };
+      return chapters[nextIndex];
     }
 
-    return undefined;
+    return null;
   },
 }));
 
