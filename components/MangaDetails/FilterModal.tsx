@@ -1,12 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  FlatList,
-  StyleSheet,
-  Dimensions,
-} from "react-native";
+import { View, Text, Pressable, FlatList, Dimensions } from "react-native";
 import Modal from "react-native-modal";
 
 interface FilterModalProps {
@@ -25,10 +18,12 @@ const CustomCheckbox = ({
   onValueChange: () => void;
 }) => (
   <Pressable
-    style={[styles.checkbox, checked && styles.checkboxChecked]}
+    className={`w-6 h-6 border-2 rounded justify-center items-center ${
+      checked ? "bg-blue-500" : "border-blue-500"
+    }`}
     onPress={onValueChange}
   >
-    {checked && <Text style={styles.checkmark}>✓</Text>}
+    {checked && <Text className="text-white text-lg font-bold">✓</Text>}
   </Pressable>
 );
 
@@ -80,17 +75,28 @@ export default function FilterModal({
     <Modal
       isVisible={isVisible}
       onBackdropPress={onClose}
-      style={styles.modalContainer}
+      className="m-0 justify-center items-center"
     >
-      <View style={styles.modalContent}>
-        <View style={styles.header}>
-          <Text style={styles.title}>Filter Scanlator Groups</Text>
-          <View style={styles.selectButtons}>
-            <Pressable onPress={handleSelectAll} style={styles.selectButton}>
-              <Text style={styles.selectButtonText}>Select All</Text>
+      <View
+        className="bg-gray-900 rounded-lg p-5"
+        style={{ width: width * 0.9, maxHeight: height * 0.8 }}
+      >
+        <View className="mb-2">
+          <Text className="text-white text-lg font-bold mb-2">
+            Filter Scanlator Groups
+          </Text>
+          <View className="flex-row justify-between mb-2">
+            <Pressable
+              onPress={handleSelectAll}
+              className="bg-gray-800 p-2 rounded"
+            >
+              <Text className="text-[#1288ff] text-sm">Select All</Text>
             </Pressable>
-            <Pressable onPress={handleDeselectAll} style={styles.selectButton}>
-              <Text style={styles.selectButtonText}>Deselect All</Text>
+            <Pressable
+              onPress={handleDeselectAll}
+              className="bg-gray-800 p-2 rounded"
+            >
+              <Text className="text-[#1288ff] text-sm">Deselect All</Text>
             </Pressable>
           </View>
         </View>
@@ -98,115 +104,29 @@ export default function FilterModal({
           data={groupNames}
           keyExtractor={(item) => item}
           renderItem={({ item }) => (
-            <View style={styles.groupItem}>
+            <View className="flex-row items-center mb-2">
               <CustomCheckbox
                 checked={selectedGroups.includes(item)}
                 onValueChange={() => handleToggleGroup(item)}
               />
-              <Text style={styles.groupName}>{item}</Text>
+              <Text className="text-white ml-2 text-base">{item}</Text>
             </View>
           )}
-          style={styles.flatList}
+          style={{ maxHeight: height * 0.5 }}
         />
-        <Pressable onPress={handleSave} style={styles.saveButton}>
-          <Text style={styles.saveButtonText}>Save</Text>
+        <Pressable
+          onPress={handleSave}
+          className="bg-[#1288ff] p-3 rounded mt-2 items-center"
+        >
+          <Text className="text-white text-base font-bold">Save</Text>
         </Pressable>
-        <Pressable onPress={handleCancel} style={styles.cancelButton}>
-          <Text style={styles.cancelButtonText}>Cancel</Text>
+        <Pressable
+          onPress={handleCancel}
+          className="bg-gray-800 p-3 rounded mt-2 items-center"
+        >
+          <Text className="text-white text-base font-bold">Cancel</Text>
         </Pressable>
       </View>
     </Modal>
   );
 }
-
-const styles = StyleSheet.create({
-  modalContainer: {
-    margin: 0,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#1c1c1e",
-    borderRadius: 10,
-    width: width * 0.9,
-    maxHeight: height * 0.8,
-    padding: 20,
-  },
-  header: {
-    marginBottom: 10,
-  },
-  title: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  selectButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  selectButton: {
-    backgroundColor: "#2c2c2e",
-    padding: 8,
-    borderRadius: 5,
-  },
-  selectButtonText: {
-    color: "#1288ff",
-    fontSize: 14,
-  },
-  flatList: {
-    maxHeight: height * 0.5,
-  },
-  groupItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  groupName: {
-    color: "#fff",
-    marginLeft: 10,
-    fontSize: 16,
-  },
-  saveButton: {
-    backgroundColor: "#1288ff",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  cancelButton: {
-    backgroundColor: "#2c2c2e",
-    padding: 10,
-    borderRadius: 5,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  cancelButtonText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderWidth: 2,
-    borderColor: "#1288ff",
-    borderRadius: 4,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  checkboxChecked: {
-    backgroundColor: "#1288ff",
-  },
-  checkmark: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-});
