@@ -19,8 +19,5 @@ web-build/
 expo-env.d.ts
 # @end expo-cli
 
-nativewind-env.d.ts
-
-%ProgramData%
 
 bun.lockb

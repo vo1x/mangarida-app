@@ -162,7 +162,7 @@ const Reader: React.FC = () => {
             />
           )}
           onEndReached={handleEndReached}
-          onEndReachedThreshold={0.1}
+          onEndReachedThreshold={0.5}
           onViewableItemsChanged={handleViewableItemsChanged}
           viewabilityConfig={viewabilityConfig}
           maxToRenderPerBatch={10}
