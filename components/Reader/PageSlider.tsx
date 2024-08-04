@@ -11,7 +11,7 @@ const PageSlider = ({
 }: {
   visible: boolean;
   currentPageIndex: number;
-  chapterLength: number;
+  chapterLength: number | null | undefined;
 }) => {
   const opacity = useRef(new Animated.Value(0)).current;
 
@@ -38,14 +38,16 @@ const PageSlider = ({
               backgroundColor: "#888",
             }}
           >
-            <View
-              style={{
-                width: `${(currentPageIndex / (chapterLength - 1)) * 100}%`,
-                height: '100%',
-                borderRadius: 5,
-                backgroundColor: "#1288ff",
-              }}
-            />
+            {chapterLength === null || chapterLength === undefined ? null : (
+              <View
+                style={{
+                  width: `${(currentPageIndex / (chapterLength - 1)) * 100}%`,
+                  height: "100%",
+                  borderRadius: 5,
+                  backgroundColor: "#1288ff",
+                }}
+              />
+            )}
           </View>
           <Text className="text-white text-base mt-2">
             Page {currentPageIndex + 1} of {chapterLength}

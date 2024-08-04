@@ -50,6 +50,7 @@ export interface ChapterStoreState {
   chapters: Chapter[];
   setChapterLibrary: (newChapters: Chapter[]) => void;
   getNextChapter: (currentChNum: number) => Promise<Chapter | null>;
+  getPreviousChapter: (currentChNum: number) => Promise<Chapter | null>;
 }
 
 export interface LibraryStoreState {
@@ -72,8 +73,4 @@ export interface ReadChaptersStoreState {
 
 export interface PageItemProps {
   item: Page;
-  index: number;
-  currentChapterNum: number;
-  prevChapterNum: number;
-  loadedChapters: Chapter[];
 }

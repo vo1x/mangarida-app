@@ -1,14 +1,15 @@
-import React, { useEffect, useState, useCallback, useRef, memo } from "react";
-import { View, StatusBar, Text, FlatList, FlatListProps } from "react-native";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { View, StatusBar, FlatList } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import { useLocalSearchParams } from "expo-router";
 import useMangarida from "@/hooks/useMangarida";
 import useReadChaptersStore from "@/stores/readChaptersStore";
 import useChapterStore from "@/stores/chapterStore";
 import Header from "@/components/Reader/Header";
-import PageItem from "@/components/Reader/Page";
 import PageSlider from "@/components/Reader/PageSlider";
-import { Page, Chapter } from "@/interfaces/interfaces";
+import { Chapter } from "@/interfaces/interfaces";
+import PageList from "@/components/Reader/PageList";
+import Divider from "@/components/Reader/Divider";
 
 interface ReaderParams extends Record<string, string> {
   chID: string;
@@ -26,13 +27,10 @@ const Reader: React.FC = () => {
   const [currentPageIndex, setCurrentPageIndex] = useState<number>(0);
   const [loadedChapters, setLoadedChapters] = useState<Chapter[]>([]);
   const [chapterIdToFetch, setChapterIdToFetch] = useState<string>(initialChID);
-  const [prevChapterNum, setPreviousChapterNum] =
-    useState<number>(initialChNum);
   const [currentChapterNum, setCurrentChapterNum] =
     useState<number>(initialChNum);
-  const [currentChapterLength, setCurrentChapterLength] = useState<number>(0);
 
-  const flatListRef = useRef<FlatList<Page>>(null);
+  const flatListRef = useRef<FlatList<Chapter>>(null);
 
   const handleDoubleTap = () => {
     setIsViewed((prev) => !prev);
@@ -67,74 +65,45 @@ const Reader: React.FC = () => {
           return updated;
         }
 
-        if (fetchedPages) {
-          const newChapter: Chapter = {
-            chId: chapterIdToFetch,
-            chNum: currentChapterNum,
-            pages: fetchedPages,
-          };
+        const newChapter: Chapter = {
+          chId: chapterIdToFetch,
+          chNum:
+            loadedChapters.length > 0
+              ? loadedChapters[loadedChapters.length - 1].chNum + 1
+              : initialChNum,
+          pages: fetchedPages,
+        };
 
-          setCurrentChapterLength(fetchedPages.length);
-          const updated = [...prev, newChapter].sort(
-            (a, b) => a.chNum - b.chNum
-          );
-          if (updated.length > MAX_CHAPTERS_IN_MEMORY) {
-            updated.shift();
-          }
-          return updated;
-        } else {
-          console.error("Fetched pages are undefined");
-          return prev;
+        const updated = [...prev, newChapter].sort((a, b) => a.chNum - b.chNum);
+        if (updated.length > MAX_CHAPTERS_IN_MEMORY) {
+          updated.shift();
         }
+        return updated;
       });
     }
-  }, [fetchedPages, isPageFetchSuccess, chapterIdToFetch, currentChapterNum]);
+  }, [
+    fetchedPages,
+    isPageFetchSuccess,
+    chapterIdToFetch,
+    initialChNum,
+    loadedChapters.length,
+  ]);
 
   const handleEndReached = async () => {
     await markChapterAsRead(chapterIdToFetch);
     const nextChapter = await getNextChapter(currentChapterNum);
 
-    if (nextChapter) {
-      if (chapterIdToFetch !== nextChapter.chId) {
-        setChapterIdToFetch(nextChapter.chId);
-        setPreviousChapterNum(nextChapter.chNum - 1);
-        setCurrentChapterNum(nextChapter.chNum);
-      }
-    } else {
-      const currentChapter = loadedChapters.find(
-        (ch) => ch.chNum === currentChapterNum
-      );
-      if (currentChapter && currentChapter.pages) {
-        setCurrentChapterLength(currentChapter.pages.length);
-      }
+    if (nextChapter && chapterIdToFetch !== nextChapter.chId) {
+      setChapterIdToFetch(nextChapter.chId);
     }
   };
 
-  const viewabilityConfig = {
-    itemVisiblePercentThreshold: 50,
-  };
+  const onViewCallBack = useCallback((viewableItems: any) => {
+    setCurrentChapterNum(viewableItems.changed[0].item.chNum);
+  }, []);
 
-  const handleViewableItemsChanged = useCallback<
-    NonNullable<FlatListProps<Page>["onViewableItemsChanged"]>
-  >(
-    ({ viewableItems }) => {
-      if (viewableItems.length > 0) {
-        const firstViewableItem = viewableItems[0];
-        const currentChapter = loadedChapters.find(
-          (ch) => ch.chNum === currentChapterNum
-        );
-        if (currentChapter && currentChapter.pages) {
-          const pageIndex = currentChapter.pages.findIndex(
-            (page) => page.pgNum === firstViewableItem.item.pgNum
-          );
-          if (pageIndex >= 0) {
-            setCurrentPageIndex(pageIndex);
-          }
-        }
-      }
-    },
-    [loadedChapters, currentChapterNum]
-  );
+  const viewConfigRef = useRef({ viewAreaCoveragePercentThreshold: 100 });
+
   return (
     <GestureDetector gesture={doubleTap}>
       <View className="flex-1">
@@ -149,29 +118,40 @@ const Reader: React.FC = () => {
         />
         <FlatList
           ref={flatListRef}
-          data={loadedChapters
-            .filter((ch) => ch.pages !== undefined)
-            .flatMap((ch) => ch.pages!)
-            .filter((page): page is Page => page !== undefined)}
-          renderItem={(props) => (
-            <PageItem
-              {...props}
-              currentChapterNum={currentChapterNum}
-              prevChapterNum={prevChapterNum}
-              loadedChapters={loadedChapters}
-            />
+          data={loadedChapters}
+          
+          renderItem={({ item }) => (
+            <View>
+              <PageList
+                chapter={item}
+                setCurrentPageIndex={setCurrentPageIndex}
+              />
+              <Divider
+                dividerType={
+                  currentChapterNum === item.chNum
+                    ? `Next Chapter ${currentChapterNum + 1}`
+                    : `Previous Chapter ${currentChapterNum - 1}`
+                }
+              />
+            </View>
           )}
+          keyExtractor={(item) => item.chId}
           onEndReached={handleEndReached}
           onEndReachedThreshold={0.5}
-          onViewableItemsChanged={handleViewableItemsChanged}
-          viewabilityConfig={viewabilityConfig}
-          maxToRenderPerBatch={10}
-          initialNumToRender={10}
+          onViewableItemsChanged={onViewCallBack}
+          viewabilityConfig={viewConfigRef.current}
+          maxToRenderPerBatch={3}
+          initialNumToRender={3}
         />
-
         <PageSlider
           visible={isViewed}
-          chapterLength={currentChapterLength}
+          chapterLength={
+            loadedChapters.length > 0
+              ? loadedChapters.find(
+                  (chapter) => chapter.chNum === currentChapterNum
+                )?.pages?.length ?? 0
+              : 0
+          }
           currentPageIndex={currentPageIndex}
         />
       </View>
